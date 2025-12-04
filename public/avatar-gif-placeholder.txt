@@ -1,0 +1,9 @@
+PLACEHOLDER: Add your animated avatar GIF here (avatar.gif)
+
+This file should be replaced with your actual animated avatar GIF.
+The GIF will play when the AI is speaking to show visual feedback.
+
+Recommended size: 512x512px or larger
+Format: Animated GIF
+Frame rate: 10-30 fps
+Duration: 1-3 seconds loop

@@ -4,6 +4,8 @@ import { searchRAG } from '@/lib/rag'
 import { saveToRedis, getFromRedis } from '@/lib/redis'
 import { generateSpeech } from '@/lib/voice'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const { message, language, currentSlide, sessionId = 'default' } = await request.json()

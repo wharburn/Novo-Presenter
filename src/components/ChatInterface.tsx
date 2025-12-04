@@ -31,18 +31,88 @@ export default function ChatInterface({
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const hasPlayedIntro = useRef(false)
+  const autoAdvanceTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  const presentNextSlide = async (slideNumber: number) => {
+    if (slideNumber >= 11 || isProcessing) return
+    
+    setIsProcessing(true)
+    
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: 'continue',
+          language,
+          currentSlide: slideNumber,
+        }),
+      })
+
+      const data = await response.json()
+      
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: data.message 
+      }])
+
+      if (data.nextSlide !== undefined && data.nextSlide !== slideNumber) {
+        onSlideChange(data.nextSlide)
+      }
+
+      if (data.audioUrl) {
+        if (audioRef.current) {
+          audioRef.current.pause()
+          audioRef.current = null
+        }
+        
+        onSpeakingChange(true)
+        const audio = new Audio(data.audioUrl)
+        audioRef.current = audio
+        
+        audio.onended = () => {
+          onSpeakingChange(false)
+          audioRef.current = null
+          
+          if (autoAdvanceTimerRef.current) {
+            clearTimeout(autoAdvanceTimerRef.current)
+          }
+          
+          const nextSlide = data.nextSlide !== undefined ? data.nextSlide : slideNumber + 1
+          if (nextSlide < 11) {
+            autoAdvanceTimerRef.current = setTimeout(() => {
+              onSlideChange(nextSlide)
+              presentNextSlide(nextSlide)
+            }, 3000)
+          }
+        }
+        audio.onerror = () => {
+          onSpeakingChange(false)
+          audioRef.current = null
+        }
+        audio.play().catch(() => {
+          onSpeakingChange(false)
+          audioRef.current = null
+        })
+      }
+    } catch (error) {
+      console.error('Error presenting slide:', error)
+    } finally {
+      setIsProcessing(false)
+    }
+  }
 
   useEffect(() => {
     if (!hasIntroduced && !hasPlayedIntro.current) {
       hasPlayedIntro.current = true
       
       const introduction = language === 'en'
-        ? "Hello! I'm NoVo, your AI presentation assistant. I'll be guiding you through the NoVo Travel Assistant pitch deck today. I'll walk you through our innovative travel solution, explain our business model, and answer any questions you have about our company and investment opportunity. Let's begin with our first slide!"
-        : "Olá! Sou a NoVo, sua assistente de apresentação de IA. Vou guiá-lo através do pitch deck do NoVo Travel Assistant hoje. Vou mostrar nossa solução inovadora de viagem, explicar nosso modelo de negócio e responder a quaisquer perguntas que você tenha sobre nossa empresa e oportunidade de investimento. Vamos começar com nosso primeiro slide!"
+        ? "Hello! I'm NoVo, your AI presentation assistant. I'll be guiding you through the NoVo Travel Assistant pitch deck today. Feel free to ask questions at any time - I'll pause and answer before continuing with the presentation. Let's begin with our first slide!"
+        : "Olá! Sou a NoVo, sua assistente de apresentação de IA. Vou guiá-lo através do pitch deck do NoVo Travel Assistant hoje. Sinta-se à vontade para fazer perguntas a qualquer momento - farei uma pausa e responderei antes de continuar com a apresentação. Vamos começar com nosso primeiro slide!"
       
       setMessages([{ role: 'assistant', content: introduction }])
       onIntroductionComplete()
@@ -75,6 +145,14 @@ export default function ChatInterface({
               console.log('Audio ended')
               onSpeakingChange(false)
               audioRef.current = null
+              
+              if (autoAdvanceTimerRef.current) {
+                clearTimeout(autoAdvanceTimerRef.current)
+              }
+              autoAdvanceTimerRef.current = setTimeout(() => {
+                onSlideChange(1)
+                presentNextSlide(1)
+              }, 3000)
             }
             audio.onerror = (e) => {
               console.error('Audio playback error:', e)
@@ -94,8 +172,24 @@ export default function ChatInterface({
     }
   }, [hasIntroduced, language, onIntroductionComplete, onSpeakingChange])
 
+  useEffect(() => {
+    return () => {
+      if (autoAdvanceTimerRef.current) {
+        clearTimeout(autoAdvanceTimerRef.current)
+      }
+      if (audioRef.current) {
+        audioRef.current.pause()
+      }
+    }
+  }, [])
+
   const handleSendMessage = async () => {
     if (!input.trim() || isProcessing) return
+
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current)
+      autoAdvanceTimerRef.current = null
+    }
 
     const userMessage = input.trim()
     setInput('')
@@ -137,6 +231,15 @@ export default function ChatInterface({
         audio.onended = () => {
           onSpeakingChange(false)
           audioRef.current = null
+          
+          if (autoAdvanceTimerRef.current) {
+            clearTimeout(autoAdvanceTimerRef.current)
+          }
+          if (data.nextSlide !== undefined && data.nextSlide < 10) {
+            autoAdvanceTimerRef.current = setTimeout(() => {
+              onSlideChange(data.nextSlide + 1)
+            }, 3000)
+          }
         }
         audio.onerror = () => {
           onSpeakingChange(false)

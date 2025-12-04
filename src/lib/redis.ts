@@ -1,16 +1,24 @@
 import { Redis } from '@upstash/redis'
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-})
+let redis: Redis | null = null
+
+function getRedis() {
+  if (!redis) {
+    redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL!,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    })
+  }
+  return redis
+}
 
 export async function saveToRedis(key: string, value: any, ttl?: number) {
   try {
+    const client = getRedis()
     if (ttl) {
-      await redis.setex(key, ttl, JSON.stringify(value))
+      await client.setex(key, ttl, JSON.stringify(value))
     } else {
-      await redis.set(key, JSON.stringify(value))
+      await client.set(key, JSON.stringify(value))
     }
   } catch (error) {
     console.error('Redis save error:', error)
@@ -19,7 +27,8 @@ export async function saveToRedis(key: string, value: any, ttl?: number) {
 
 export async function getFromRedis(key: string) {
   try {
-    const value = await redis.get(key)
+    const client = getRedis()
+    const value = await client.get(key)
     return value ? JSON.parse(value as string) : null
   } catch (error) {
     console.error('Redis get error:', error)
@@ -29,7 +38,8 @@ export async function getFromRedis(key: string) {
 
 export async function deleteFromRedis(key: string) {
   try {
-    await redis.del(key)
+    const client = getRedis()
+    await client.del(key)
   } catch (error) {
     console.error('Redis delete error:', error)
   }

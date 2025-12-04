@@ -1,8 +1,15 @@
 import Anthropic from '@anthropic-ai/sdk'
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
+let anthropic: Anthropic | null = null
+
+function getAnthropic() {
+  if (!anthropic) {
+    anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    })
+  }
+  return anthropic
+}
 
 interface ChatParams {
   message: string
@@ -62,7 +69,7 @@ Quando quiser ir para um slide específico, inclua [GOTO_SLIDE:X] onde X é o n�
     { role: 'user', content: message },
   ]
 
-  const response = await anthropic.messages.create({
+  const response = await getAnthropic().messages.create({
     model: 'claude-3-5-sonnet-20241022',
     max_tokens: 1024,
     system: systemPrompt,

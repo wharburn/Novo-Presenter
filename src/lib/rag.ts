@@ -1,20 +1,28 @@
 import { Index } from '@upstash/vector'
 
-const index = new Index({
-  url: process.env.UPSTASH_VECTOR_REST_URL!,
-  token: process.env.UPSTASH_VECTOR_REST_TOKEN!,
-})
+let index: Index | null = null
+
+function getIndex() {
+  if (!index) {
+    index = new Index({
+      url: process.env.UPSTASH_VECTOR_REST_URL!,
+      token: process.env.UPSTASH_VECTOR_REST_TOKEN!,
+    })
+  }
+  return index
+}
 
 export async function searchRAG(query: string, language: string) {
   try {
-    const resultsInLanguage = await index.query({
+    const idx = getIndex()
+    const resultsInLanguage = await idx.query({
       data: query,
       topK: 5,
       includeMetadata: true,
       filter: `language = '${language}'`,
     })
 
-    const resultsAllLanguages = await index.query({
+    const resultsAllLanguages = await idx.query({
       data: query,
       topK: 3,
       includeMetadata: true,
@@ -41,7 +49,8 @@ export async function searchRAG(query: string, language: string) {
 
 export async function indexPitchDeck(content: string, language: string, slideNumber: number) {
   try {
-    await index.upsert({
+    const idx = getIndex()
+    await idx.upsert({
       id: `${language}-slide-${slideNumber}`,
       data: content,
       metadata: {

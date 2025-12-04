@@ -4,6 +4,9 @@ const nextConfig = {
   images: {
     domains: [],
   },
+  experimental: {
+    serverComponentsExternalPackages: ['@anthropic-ai/sdk', '@upstash/redis', '@upstash/vector'],
+  },
 }
 
 module.exports = nextConfig

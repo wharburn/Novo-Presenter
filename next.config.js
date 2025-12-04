@@ -7,6 +7,7 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['@anthropic-ai/sdk', '@upstash/redis', '@upstash/vector'],
   },
+  output: 'standalone',
 }
 
 module.exports = nextConfig

@@ -7,6 +7,8 @@ import PitchDeck from '@/components/PitchDeck'
 import ChatInterface from '@/components/ChatInterface'
 import LanguageSelector from '@/components/LanguageSelector'
 
+export const dynamic = 'force-dynamic'
+
 export default function Home() {
   const [language, setLanguage] = useState<'en' | 'pt'>('en')
   const [isSpeaking, setIsSpeaking] = useState(false)

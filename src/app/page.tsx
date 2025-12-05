@@ -19,14 +19,14 @@ export default function Home() {
 
   return (
     <main className="h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col overflow-hidden">
-      <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex-1">
+      <div className="flex items-start justify-between px-4 sm:px-6 lg:px-8">
+        <div className="flex-1 pt-6">
           {!hasStarted && (
             <StartButton onClick={() => setHasStarted(true)} />
           )}
         </div>
         <Header />
-        <div className="flex-1 flex justify-end">
+        <div className="flex-1 flex justify-end pt-6">
           <LanguageSelector language={language} onLanguageChange={setLanguage} />
         </div>
       </div>

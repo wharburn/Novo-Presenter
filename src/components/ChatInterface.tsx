@@ -77,9 +77,9 @@ export default function ChatInterface({
     }
   }, [])
 
-  // Hume EVI config ID from env - use EVI 4 mini for Portuguese
+  // Hume EVI config ID from env - use Porto Woman (EVI 4 mini) for Portuguese
   const humeConfigId = language === 'pt'
-    ? (process.env.NEXT_PUBLIC_HUME_CONFIG_ID_PT || process.env.NEXT_PUBLIC_HUME_CONFIG_ID || '')
+    ? (process.env.NEXT_PUBLIC_HUME_PORT_VOICE_CONFIG || process.env.NEXT_PUBLIC_HUME_CONFIG_ID_PT || process.env.NEXT_PUBLIC_HUME_CONFIG_ID || '')
     : (process.env.NEXT_PUBLIC_HUME_CONFIG_ID || '')
 
   // Q&A end message - spoken by NoVo

@@ -42,10 +42,24 @@ function VoiceChatInner({
 
   const handleStart = async () => {
     try {
-      // Connect with auth token and config ID
+      // Get the CLM endpoint URL for RAG-powered responses
+      const clmUrl = typeof window !== 'undefined'
+        ? `${window.location.origin}/api/hume-clm`
+        : process.env.NEXT_PUBLIC_SITE_URL
+          ? `${process.env.NEXT_PUBLIC_SITE_URL}/api/hume-clm`
+          : undefined
+
+      console.log('[VoiceChat] Connecting with CLM URL:', clmUrl)
+
+      // Connect with auth token, config ID, and custom language model
       await connect({
         auth: { type: 'accessToken', value: accessToken },
         configId: configId,
+        ...(clmUrl && {
+          customLanguageModel: {
+            url: clmUrl,
+          }
+        })
       })
       setIsStarted(true)
     } catch (error) {

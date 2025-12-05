@@ -42,7 +42,7 @@ export default function Home() {
           </div>
         </div>
         
-        <div className="flex lg:hidden justify-center gap-2 -mt-1.5">
+        <div className="flex lg:hidden justify-center gap-2 -mt-5">
           {!hasStarted && (
             <StartButton onClick={() => setHasStarted(true)} />
           )}

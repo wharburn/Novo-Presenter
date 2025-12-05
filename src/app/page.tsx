@@ -59,7 +59,6 @@ export default function Home() {
               <div className="absolute left-0 top-0 z-10">
                 <Avatar isSpeaking={isSpeaking} hasStarted={hasStarted} />
               </div>
-              </div>
               
               <PitchDeck 
                 language={language} 

@@ -45,15 +45,18 @@ html, body {
 
 @keyframes avatar-rise {
   0% {
-    transform: translateY(0) scale(1);
+    transform: scale(1);
+    top: 0;
+    position: absolute;
   }
   100% {
-    transform: translateY(-200px) scale(1.25);
+    transform: scale(1.25);
+    top: 15px;
+    position: fixed;
   }
 }
 
 .animate-avatar-rise {
   animation: avatar-rise 1.5s ease-out forwards;
-  position: fixed !important;
   z-index: 100 !important;
 }

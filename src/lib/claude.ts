@@ -26,6 +26,10 @@ export async function chatWithClaude({
   ragContext,
   conversationHistory,
 }: ChatParams) {
+  console.log('chatWithClaude called with:', { message, language, currentSlide })
+  console.log('API Key present:', !!process.env.ANTHROPIC_API_KEY)
+  console.log('API Key starts with:', process.env.ANTHROPIC_API_KEY?.substring(0, 10))
+  
   const systemPrompt = language === 'en'
     ? `You are NoVo, an AI presentation assistant for NoVo Travel Assistant. You are presenting to potential investors.
 
@@ -79,14 +83,19 @@ FLUXO DA APRESENTAÇÃO:
     { role: 'user', content: message },
   ]
 
-  const response = await getAnthropic().messages.create({
-    model: 'claude-3-5-sonnet-20240620',
-    max_tokens: 1024,
-    system: systemPrompt,
-    messages: messages as any,
-  })
+  console.log('Calling Anthropic API with model: claude-3-5-sonnet-latest')
+  
+  try {
+    const response = await getAnthropic().messages.create({
+      model: 'claude-3-5-sonnet-latest',
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: messages as any,
+    })
 
-  const content = response.content[0].type === 'text' 
+    console.log('Anthropic API response received')
+    
+    const content = response.content[0].type === 'text' 
     ? response.content[0].text 
     : ''
 
@@ -108,5 +117,10 @@ FLUXO DA APRESENTAÇÃO:
   return {
     message: cleanedContent.trim(),
     nextSlide,
+  }
+  } catch (error: any) {
+    console.error('Anthropic API error:', error)
+    console.error('Error details:', JSON.stringify(error, null, 2))
+    throw error
   }
 }

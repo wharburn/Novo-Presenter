@@ -235,6 +235,12 @@ export default function ChatInterface({
   }, [hasIntroduced, onIntroductionComplete])
 
   useEffect(() => {
+    // Skip greeting if skipToEnd is triggered
+    if (skipToEnd) {
+      hasPlayedGreeting.current = true
+      return
+    }
+
     if (hasStarted && !hasPlayedGreeting.current) {
       hasPlayedGreeting.current = true
       setCurrentNarration(greetingText)
@@ -291,7 +297,7 @@ export default function ChatInterface({
         })
         .catch(err => console.error('Greeting error:', err))
     }
-  }, [hasStarted, greetingText, language, onSpeakingChange, initializeAudio])
+  }, [hasStarted, skipToEnd, greetingText, language, onSpeakingChange, initializeAudio])
 
   useEffect(() => {
     return () => {

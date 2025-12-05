@@ -24,8 +24,12 @@ export default function ChatInterface({
   hasIntroduced,
   onIntroductionComplete
 }: ChatInterfaceProps) {
+  const welcomeText = language === 'en'
+    ? "Hello! I'm NoVo, the new personal assistant from Novocom Ai. Just press the start button when you are ready and we can begin to go through the presentation. It should not take longer than 5 minutes. You also can stop me and ask any questions you have at any time and I will try my best to answer them for you.\n\nWhenever you are ready…."
+    : "Olá! Sou a NoVo, a nova assistente pessoal da Novocom Ai. Basta pressionar o botão iniciar quando estiver pronto e podemos começar a percorrer a apresentação. Não deve levar mais de 5 minutos. Você também pode me interromper e fazer qualquer pergunta que tiver a qualquer momento e farei o meu melhor para respondê-las.\n\nQuando estiver pronto…."
+  
   const [messages, setMessages] = useState<Message[]>([])
-  const [currentNarration, setCurrentNarration] = useState('')
+  const [currentNarration, setCurrentNarration] = useState(welcomeText)
   const [input, setInput] = useState('')
   const [isRecording, setIsRecording] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)

@@ -20,7 +20,11 @@ export default function Home() {
   return (
     <main className="h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col overflow-hidden">
       <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex-1"></div>
+        <div className="flex-1">
+          {!hasStarted && (
+            <StartButton onClick={() => setHasStarted(true)} />
+          )}
+        </div>
         <Header />
         <div className="flex-1 flex justify-end">
           <LanguageSelector language={language} onLanguageChange={setLanguage} />
@@ -31,10 +35,6 @@ export default function Home() {
         <div className="h-full max-w-screen-2xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-4 h-full px-4 sm:px-6 lg:px-8">
             <div className="flex-1 relative min-h-0 pl-0">
-              {!hasStarted && (
-                <StartButton onClick={() => setHasStarted(true)} />
-              )}
-              
               <div className="absolute left-0 top-2 z-10">
                 <Avatar isSpeaking={isSpeaking} />
               </div>

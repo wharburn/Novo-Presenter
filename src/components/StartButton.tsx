@@ -6,14 +6,8 @@ export default function StartButton({ onClick }: StartButtonProps) {
   return (
     <button
       onClick={onClick}
-      className="absolute left-8 top-1/2 transform -translate-y-1/2 
-                 px-12 py-4 text-xl font-semibold
-                 bg-white text-[#5DADE2] 
-                 rounded-full shadow-lg
-                 border-2 border-[#5DADE2]
-                 hover:bg-[#5DADE2] hover:text-white
-                 transition-all duration-300
-                 hover:shadow-xl hover:scale-105"
+      className="px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-sm sm:text-base
+                 bg-[#5DADE2] text-white hover:bg-[#4A9FD5]"
     >
       Start
     </button>

@@ -18,6 +18,15 @@ export async function GET(request: NextRequest) {
     const files = fs.readdirSync(slidesDir)
       .filter(file => file.match(/\.(png|jpg|jpeg|webp)$/i))
       .sort((a, b) => {
+        // Handle 'end' slide - always put it last
+        const aIsEnd = a.includes('end')
+        const bIsEnd = b.includes('end')
+        
+        if (aIsEnd && !bIsEnd) return 1
+        if (!aIsEnd && bIsEnd) return -1
+        if (aIsEnd && bIsEnd) return 0
+        
+        // Normal numeric sorting for all other slides
         const numA = parseInt(a.match(/\d+/)?.[0] || '0')
         const numB = parseInt(b.match(/\d+/)?.[0] || '0')
         return numA - numB

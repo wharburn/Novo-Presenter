@@ -295,37 +295,54 @@ export default function ChatInterface({
 
   const formatTextWithBullets = (text: string) => {
     const lines = text.split('\n')
-    return lines.map((line, idx) => {
+    const elements: JSX.Element[] = []
+    
+    lines.forEach((line, idx) => {
       const trimmedLine = line.trim()
+      if (!trimmedLine) return
       
-      if (!trimmedLine) return null
-      
-      // Check if line has **text**: pattern (bullet point with bold label)
-      const bulletMatch = trimmedLine.match(/^\*\*([^*]+)\*\*:\s*(.+)$/)
-      if (bulletMatch) {
-        const label = bulletMatch[1]
-        const content = bulletMatch[2]
-        return (
-          <div key={idx} className="flex items-start gap-2 my-1">
-            <span className="text-[#5DADE2] font-bold mt-1">•</span>
-            <span>{content}</span>
+      // Check if line is just **text** (main heading)
+      const mainHeadingMatch = trimmedLine.match(/^\*\*([^*]+)\*\*$/)
+      if (mainHeadingMatch) {
+        elements.push(
+          <div key={idx} className="font-bold text-base mb-2 mt-3 first:mt-0">
+            {mainHeadingMatch[1]}
           </div>
         )
+        return
       }
       
-      // Check if line is just **text** (heading)
-      const headingMatch = trimmedLine.match(/^\*\*([^*]+)\*\*$/)
-      if (headingMatch) {
-        return (
-          <div key={idx} className="font-bold text-lg my-2">
-            {headingMatch[1]}
+      // Check if line has **text**: pattern (subheading with content)
+      const subheadingMatch = trimmedLine.match(/^\*\*([^*]+)\*\*:\s*(.+)$/)
+      if (subheadingMatch) {
+        const subheading = subheadingMatch[1]
+        const content = subheadingMatch[2]
+        elements.push(
+          <div key={idx} className="mb-2">
+            <div className="font-semibold text-sm">{subheading}</div>
+            <div className="text-sm ml-4">{content}</div>
           </div>
         )
+        return
+      }
+      
+      // Check if line starts with bullet point
+      if (trimmedLine.startsWith('•') || trimmedLine.startsWith('-')) {
+        const bulletText = trimmedLine.substring(1).trim()
+        elements.push(
+          <div key={idx} className="flex items-start gap-2 my-1 ml-2">
+            <span className="text-[#5DADE2] font-bold mt-0.5">•</span>
+            <span className="text-sm">{bulletText}</span>
+          </div>
+        )
+        return
       }
       
       // Regular text
-      return <div key={idx} className="my-1">{trimmedLine}</div>
-    }).filter(Boolean)
+      elements.push(<div key={idx} className="text-sm my-1">{trimmedLine}</div>)
+    })
+    
+    return elements
   }
 
   return (

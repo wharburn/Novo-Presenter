@@ -8,7 +8,17 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, language, currentSlide, sessionId = 'default' } = await request.json()
+    const { message, language, currentSlide, sessionId = 'default', textOnly = false } = await request.json()
+
+    // Handle text-to-speech only requests (no AI generation)
+    if (textOnly) {
+      const audioUrl = await generateSpeech(message, language)
+      return NextResponse.json({
+        message,
+        nextSlide: currentSlide,
+        audioUrl,
+      })
+    }
 
     if (message === 'introduce_and_start') {
       const introText = language === 'en'

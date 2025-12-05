@@ -152,7 +152,7 @@ export default function ChatInterface({
       hasPlayedGreeting.current = true
       setCurrentNarration(greetingText)
       
-      // Play greeting audio
+      // Play greeting audio - textOnly mode to avoid AI generation
       fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -160,6 +160,7 @@ export default function ChatInterface({
           message: greetingText,
           language,
           currentSlide: 0,
+          textOnly: true,
         }),
       })
         .then(res => res.json())

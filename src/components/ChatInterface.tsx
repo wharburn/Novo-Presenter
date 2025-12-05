@@ -97,12 +97,12 @@ export default function ChatInterface({
           }
           
           const nextSlide = data.nextSlide !== undefined ? data.nextSlide : slideNumber + 1
-          console.log('Will advance to slide:', nextSlide, 'in 1 second')
+          console.log('Will advance to slide:', nextSlide, 'immediately')
           if (nextSlide < 11) {
             autoAdvanceTimerRef.current = setTimeout(() => {
               console.log('Auto-advancing to slide:', nextSlide)
               presentNextSlide(nextSlide)
-            }, 1000)
+            }, 200)
           }
         }
         audio.onerror = (e) => {
@@ -173,7 +173,7 @@ export default function ChatInterface({
               autoAdvanceTimerRef.current = setTimeout(() => {
                 console.log('Intro ended, advancing to slide 1')
                 presentNextSlide(1)
-              }, 1000)
+              }, 200)
             }
             audio.onerror = (e) => {
               console.error('Audio playback error:', e)
@@ -293,6 +293,23 @@ export default function ChatInterface({
     setIsRecording(true)
   }
 
+  const formatTextWithBullets = (text: string) => {
+    // Convert **text** to bullet points
+    const parts = text.split(/(\*\*[^*]+\*\*)/g)
+    return parts.map((part, idx) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        const bulletText = part.replace(/\*\*/g, '')
+        return (
+          <div key={idx} className="flex items-start gap-2 my-1">
+            <span className="text-[#5DADE2] font-bold">•</span>
+            <span className="font-semibold">{bulletText}</span>
+          </div>
+        )
+      }
+      return <span key={idx}>{part}</span>
+    })
+  }
+
   return (
     <div className="h-full flex flex-col bg-gray-200 rounded-lg">
       <div className="bg-gray-300 p-3 rounded-t-lg">
@@ -303,8 +320,8 @@ export default function ChatInterface({
       
       <div className="flex-1 overflow-y-auto p-6 bg-white">
         {currentNarration ? (
-          <div className="text-gray-800 text-base leading-relaxed whitespace-pre-line">
-            {currentNarration}
+          <div className="text-gray-800 text-base leading-relaxed">
+            {formatTextWithBullets(currentNarration)}
           </div>
         ) : (
           <p className="text-gray-400 text-center text-sm">

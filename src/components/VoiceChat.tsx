@@ -84,8 +84,8 @@ function VoiceChatInner({
 
   if (!isStarted) {
     return (
-      <div className="flex flex-col items-center gap-4 p-6">
-        <div className="text-center text-gray-600 mb-4">
+      <div className="flex flex-col items-center gap-3 p-4 lg:p-6 -mt-10 lg:mt-0">
+        <div className="text-center text-gray-600 mb-2 text-sm lg:text-base">
           {language === 'en'
             ? "Ready for a voice conversation? Click the button below to start talking with NoVo."
             : "Pronto para uma conversa por voz? Clique no botão abaixo para começar a falar com NoVo."}
@@ -106,7 +106,7 @@ function VoiceChatInner({
   }
 
   return (
-    <div className="flex flex-col items-center gap-4 p-6">
+    <div className="flex flex-col items-center gap-3 p-4 lg:p-6 -mt-10 lg:mt-0">
       {/* Voice activity indicator */}
       <div className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${
         isConnected ? 'bg-gradient-to-r from-[#5DADE2] to-[#3498DB] animate-pulse' : 'bg-gray-300'

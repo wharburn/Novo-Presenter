@@ -97,12 +97,12 @@ export default function ChatInterface({
           }
           
           const nextSlide = data.nextSlide !== undefined ? data.nextSlide : slideNumber + 1
-          console.log('Will advance to slide:', nextSlide, 'in 3 seconds')
+          console.log('Will advance to slide:', nextSlide, 'in 1 second')
           if (nextSlide < 11) {
             autoAdvanceTimerRef.current = setTimeout(() => {
               console.log('Auto-advancing to slide:', nextSlide)
               presentNextSlide(nextSlide)
-            }, 3000)
+            }, 1000)
           }
         }
         audio.onerror = (e) => {
@@ -173,7 +173,7 @@ export default function ChatInterface({
               autoAdvanceTimerRef.current = setTimeout(() => {
                 console.log('Intro ended, advancing to slide 1')
                 presentNextSlide(1)
-              }, 3000)
+              }, 1000)
             }
             audio.onerror = (e) => {
               console.error('Audio playback error:', e)

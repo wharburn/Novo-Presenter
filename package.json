@@ -4,7 +4,7 @@
   "description": "NoVo AI presentation chatbot with voice capabilities",
   "scripts": {
     "dev": "next dev",
-    "build": "next build || true",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "setup:rag": "node scripts/setup-rag.js",
@@ -19,7 +19,7 @@
     "dotenv": "^16.6.1",
     "elevenlabs-node": "^1.1.6",
     "hume": "^0.9.0",
-    "next": "^14.0.0",
+    "next": "^14.2.33",
     "pizzip": "^3.1.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

@@ -40,9 +40,9 @@ export default function PitchDeck({ language, currentSlide, onSlideChange }: Pit
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto mb-3 sm:mb-4">
-      <div className="bg-white rounded-lg shadow-xl p-2 sm:p-4">
-        <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
+    <div className="w-full max-w-4xl mx-auto h-full flex flex-col">
+      <div className="bg-white rounded-lg shadow-xl p-2 sm:p-4 flex-1 flex flex-col">
+        <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
           {slides[currentSlide] ? (
             <img 
               src={slides[currentSlide]} 
@@ -56,7 +56,7 @@ export default function PitchDeck({ language, currentSlide, onSlideChange }: Pit
           )}
         </div>
         
-        <div className="flex items-center justify-between mt-2 sm:mt-4 gap-2">
+        <div className="flex items-center justify-between mt-2 sm:mt-4 gap-2 flex-shrink-0">
           <button
             onClick={() => onSlideChange(Math.max(0, currentSlide - 1))}
             disabled={currentSlide === 0}

@@ -133,69 +133,12 @@ export default function ChatInterface({
   useEffect(() => {
     if (!hasIntroduced && !hasPlayedIntro.current) {
       hasPlayedIntro.current = true
-      
-      const introduction = language === 'en'
-        ? "Hello! I'm NoVo, your AI presentation assistant. I'll be guiding you through the NoVo Travel Assistant pitch deck today. Feel free to ask questions at any time - I'll pause and answer before continuing with the presentation. Let's begin with our first slide!"
-        : "Olá! Sou a NoVo, sua assistente de apresentação de IA. Vou guiá-lo através do pitch deck do NoVo Travel Assistant hoje. Sinta-se à vontade para fazer perguntas a qualquer momento - farei uma pausa e responderei antes de continuar com a apresentação. Vamos começar com nosso primeiro slide!"
-      
-      setCurrentNarration(introduction)
-      setMessages([{ role: 'assistant', content: introduction }])
       onIntroductionComplete()
       
-      fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: 'introduce_and_start',
-          language,
-          currentSlide: 0,
-        }),
-      })
-        .then(res => res.json())
-        .then(data => {
-          console.log('Audio response:', data)
-          if (data.audioUrl) {
-            console.log('Playing audio...')
-            
-            if (audioRef.current) {
-              audioRef.current.pause()
-              audioRef.current = null
-            }
-            
-            onSpeakingChange(true)
-            const audio = new Audio(data.audioUrl)
-            audioRef.current = audio
-            
-            audio.onended = () => {
-              console.log('Audio ended')
-              onSpeakingChange(false)
-              audioRef.current = null
-              
-              if (autoAdvanceTimerRef.current) {
-                clearTimeout(autoAdvanceTimerRef.current)
-              }
-              autoAdvanceTimerRef.current = setTimeout(() => {
-                console.log('Intro ended, advancing to slide 1')
-                presentNextSlide(1)
-              }, 200)
-            }
-            audio.onerror = (e) => {
-              console.error('Audio playback error:', e)
-              onSpeakingChange(false)
-              audioRef.current = null
-            }
-            audio.play().catch(err => {
-              console.error('Audio play failed:', err)
-              onSpeakingChange(false)
-              audioRef.current = null
-            })
-          } else {
-            console.log('No audio URL in response')
-          }
-        })
-        .catch(err => console.error('Introduction audio error:', err))
+      // Welcome text is already displayed from initial state
+      // No need to play audio or change text
     }
-  }, [hasIntroduced, language, onIntroductionComplete, onSpeakingChange])
+  }, [hasIntroduced, onIntroductionComplete])
 
   useEffect(() => {
     return () => {

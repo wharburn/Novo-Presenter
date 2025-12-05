@@ -294,20 +294,40 @@ export default function ChatInterface({
   }
 
   const formatTextWithBullets = (text: string) => {
-    // Convert **text** to bullet points
-    const parts = text.split(/(\*\*[^*]+\*\*)/g)
-    return parts.map((part, idx) => {
-      if (part.startsWith('**') && part.endsWith('**')) {
-        const bulletText = part.replace(/\*\*/g, '')
-        return (
-          <div key={idx} className="flex items-start gap-2 my-1">
-            <span className="text-[#5DADE2] font-bold">•</span>
-            <span className="font-semibold">{bulletText}</span>
-          </div>
-        )
+    const lines = text.split('\n')
+    return lines.map((line, idx) => {
+      // Check if line has **text** pattern
+      const boldMatch = line.match(/\*\*([^*]+)\*\*/)
+      
+      if (boldMatch) {
+        const boldText = boldMatch[1]
+        const afterBold = line.substring(line.indexOf('**') + boldText.length + 4).trim()
+        
+        // If there's text after the bold part, it's a bullet point
+        if (afterBold) {
+          return (
+            <div key={idx} className="flex items-start gap-2 my-1">
+              <span className="text-[#5DADE2] font-bold mt-1">•</span>
+              <span>{afterBold}</span>
+            </div>
+          )
+        } else {
+          // Just bold text, it's a heading
+          return (
+            <div key={idx} className="font-bold text-lg my-2">
+              {boldText}
+            </div>
+          )
+        }
       }
-      return <span key={idx}>{part}</span>
-    })
+      
+      // Regular text
+      if (line.trim()) {
+        return <div key={idx} className="my-1">{line}</div>
+      }
+      
+      return null
+    }).filter(Boolean)
   }
 
   return (

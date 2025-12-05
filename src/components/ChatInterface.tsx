@@ -48,10 +48,32 @@ export default function ChatInterface({
   const [highlightedSection, setHighlightedSection] = useState<number>(-1)
   const [humeAccessToken, setHumeAccessToken] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  // Persistent Audio element for mobile compatibility - created on first user interaction
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const audioInitialized = useRef(false)
   const hasPlayedIntro = useRef(false)
   const hasPlayedGreeting = useRef(false)
   const autoAdvanceTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Initialize persistent audio element (called on user interaction)
+  const initializeAudio = useCallback(() => {
+    if (!audioInitialized.current) {
+      console.log('[Audio] Initializing persistent Audio element for mobile')
+      const audio = new Audio()
+      // Set playsInline attribute for iOS
+      audio.setAttribute('playsinline', 'true')
+      audio.setAttribute('webkit-playsinline', 'true')
+      audioRef.current = audio
+      // Play silent audio to unlock on mobile
+      audio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'
+      audio.play().then(() => {
+        console.log('[Audio] Audio context unlocked')
+      }).catch(() => {
+        console.log('[Audio] Silent play failed, will retry on actual audio')
+      })
+      audioInitialized.current = true
+    }
+  }, [])
 
   // Hume EVI config ID from env
   const humeConfigId = process.env.NEXT_PUBLIC_HUME_CONFIG_ID || ''
@@ -124,15 +146,19 @@ export default function ChatInterface({
       console.log('Received TTS audio for slide', slideNumber)
 
       if (data.audioUrl) {
-        if (audioRef.current) {
-          audioRef.current.pause()
-          audioRef.current = null
+        // Ensure audio element exists (reuse persistent element for mobile)
+        if (!audioRef.current) {
+          const audio = new Audio()
+          audio.setAttribute('playsinline', 'true')
+          audio.setAttribute('webkit-playsinline', 'true')
+          audioRef.current = audio
         }
 
+        const audio = audioRef.current
+        audio.pause()
+        audio.currentTime = 0
+
         console.log('Playing audio for slide:', slideNumber)
-        onSpeakingChange(true)
-        const audio = new Audio(data.audioUrl)
-        audioRef.current = audio
 
         // Track audio progress for highlighting
         const numSections = sections.length
@@ -150,7 +176,6 @@ export default function ChatInterface({
         audio.onended = () => {
           console.log('Audio ended for slide:', slideNumber)
           onSpeakingChange(false)
-          audioRef.current = null
           setHighlightedSection(-1) // Reset highlighting
 
           if (autoAdvanceTimerRef.current) {
@@ -174,12 +199,14 @@ export default function ChatInterface({
         audio.onerror = (e) => {
           console.error('Audio error:', e)
           onSpeakingChange(false)
-          audioRef.current = null
         }
+
+        // Set source and play
+        audio.src = data.audioUrl
+        onSpeakingChange(true)
         audio.play().catch((err) => {
           console.error('Audio play failed:', err)
           onSpeakingChange(false)
-          audioRef.current = null
         })
       } else {
         console.log('No audio URL received for slide:', slideNumber)
@@ -206,7 +233,10 @@ export default function ChatInterface({
     if (hasStarted && !hasPlayedGreeting.current) {
       hasPlayedGreeting.current = true
       setCurrentNarration(greetingText)
-      
+
+      // Initialize persistent audio element on first user interaction (for mobile)
+      initializeAudio()
+
       // Play greeting audio - textOnly mode to avoid AI generation
       fetch('/api/chat', {
         method: 'POST',
@@ -221,34 +251,42 @@ export default function ChatInterface({
         .then(res => res.json())
         .then(data => {
           if (data.audioUrl) {
-            onSpeakingChange(true)
-            const audio = new Audio(data.audioUrl)
-            audioRef.current = audio
-            
+            // Ensure audio element exists (reuse persistent element for mobile)
+            if (!audioRef.current) {
+              const audio = new Audio()
+              audio.setAttribute('playsinline', 'true')
+              audio.setAttribute('webkit-playsinline', 'true')
+              audioRef.current = audio
+            }
+
+            const audio = audioRef.current
+            audio.pause()
+            audio.currentTime = 0
+
             audio.onended = () => {
               onSpeakingChange(false)
-              audioRef.current = null
-              
+
               // Start presenting slide 1 after greeting
               setTimeout(() => {
                 presentNextSlide(1)
               }, 200)
             }
-            
+
             audio.onerror = () => {
               onSpeakingChange(false)
-              audioRef.current = null
             }
-            
+
+            // Set source and play
+            audio.src = data.audioUrl
+            onSpeakingChange(true)
             audio.play().catch(() => {
               onSpeakingChange(false)
-              audioRef.current = null
             })
           }
         })
         .catch(err => console.error('Greeting error:', err))
     }
-  }, [hasStarted, greetingText, language, onSpeakingChange])
+  }, [hasStarted, greetingText, language, onSpeakingChange, initializeAudio])
 
   useEffect(() => {
     return () => {

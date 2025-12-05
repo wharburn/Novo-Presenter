@@ -1,0 +1,110 @@
+# NoVo AI Knowledge Base - Comprehensive Q&A Reference
+
+## Company Information
+
+### Who Created NoVo / Novocom AI?
+Novocom AI Limited was founded by Jesus Rui and Wayne Harburn. Wayne Harburn is responsible for creating NoVo, the AI travel assistant. The company is based in the UK and is SEIS eligible for UK investors, offering 50% tax relief.
+
+### Company Structure
+- Company Name: Novocom AI Limited
+- Founders: Jesus Rui and Wayne Harburn
+- Location: United Kingdom
+- Status: Early-stage startup seeking seed investment
+
+## Investment Details
+
+### Why Invest in NoVo AI?
+1. Following the "Palantir Playbook" - Palantir is the fastest-growing S&P 500 company with 810%+ stock gains since early 2024
+2. The real value in AI is creating intuitive interfaces that allow people to actually interact with and benefit from AI systems
+3. Palantir achieved 93% commercial revenue growth by bridging complex technology with practical applications
+4. NoVo applies this exact winning formula to the $1.9 trillion global travel and lifestyle market
+5. SEIS eligible for UK investors - 50% tax relief benefit
+
+### Investment Ask
+- Seeking: £65,000 initial investment for MVP development
+- SEIS eligible: Yes (50% tax relief for UK investors)
+- Use of funds: MVP development, beta testing, TfL license acquisition
+
+### Development Phases
+1. Research Phase - Current stage
+2. MVP Development - Building the core product
+3. Beta with TfL License - Testing in London transport market
+4. European Expansion - Scaling across Europe
+
+## Product Features - What NoVo Does
+
+### Core Travel Intelligence
+- Real-time flight tracking and status updates
+- Gate information and delay notifications
+- Weather at destination
+- Ground transportation booking with traffic-based timing
+- Hotel booking and details storage
+- Boarding pass management
+- Restaurant and attraction recommendations
+
+### Language & Communication (50+ Languages)
+- Real-time translation in over 50 languages
+- Voice translation for conversations
+- Meeting transcription with action items
+- Email drafting from key points
+- Document summarization
+
+### Personal Assistant Features
+- WhatsApp connectivity for PA communication
+- Passport and document storage
+- Booking confirmation management
+- Schedule coordination
+- Blood pressure monitoring
+- Sleep assistant with relaxation techniques
+- Amazon shopping integration
+- Flower ordering service
+
+### Entertainment & Leisure
+- Inflight entertainment access
+- YouTube video access
+- News and market updates
+- Restaurant discovery
+- Activity recommendations
+- City navigation assistance
+- LinkedIn integration
+- Industry news tracking
+
+### Emotional Intelligence (Powered by Hume AI)
+- Detects emotions from voice and facial expressions
+- Adapts communication style based on user's emotional state
+- Calmer responses when user is stressed
+- Matches enthusiasm when user is excited
+- Brief responses when user is tired
+- Learns preferences over time
+- Anticipates user needs
+- Creates personalized experience
+
+## Technology Stack
+
+### AI Partners
+- Hume AI: Emotional intelligence and voice understanding
+- Advanced LLM: Natural language processing
+- Real-time translation engines
+- Speech-to-text and text-to-speech
+
+### Key Differentiators
+- Emotional intelligence in travel (unique in market)
+- Conversational interface (no menus or commands)
+- 24/7 availability
+- Learns and adapts to individual users
+- Integrates multiple services in one conversation
+
+## Market Opportunity
+
+### Target Market Size
+- $1.9 trillion global travel and lifestyle market
+- Entering at AI inflection point - moving from demos to indispensable tools
+- Travel is a market where human connection matters most
+
+### Competitive Advantage
+- Emotional intelligence differentiator
+- Palantir-proven business model
+- Focus on human-AI interface layer
+- Network effects from user interactions
+- Superior user experience focus
+

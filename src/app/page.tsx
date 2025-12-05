@@ -22,32 +22,38 @@ export default function Home() {
       <Header />
       <LanguageSelector language={language} onLanguageChange={setLanguage} />
       
-      <div className="flex-1 overflow-y-auto pb-4">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-2 relative">
-          <div className="absolute left-4 sm:left-8 top-2 z-10">
-            <Avatar isSpeaking={isSpeaking} />
+      <div className="flex-1 overflow-hidden pb-4">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-full">
+          <div className="flex gap-4 h-full relative">
+            {!hasStarted && (
+              <StartButton onClick={() => setHasStarted(true)} />
+            )}
+            
+            <div className="flex-1 relative">
+              <div className="absolute left-4 sm:left-8 top-2 z-10">
+                <Avatar isSpeaking={isSpeaking} />
+              </div>
+              
+              <PitchDeck 
+                language={language} 
+                currentSlide={currentSlide}
+                onSlideChange={setCurrentSlide}
+              />
+            </div>
+            
+            {hasStarted && (
+              <div className="w-96 flex-shrink-0">
+                <ChatInterface 
+                  language={language}
+                  onSpeakingChange={setIsSpeaking}
+                  currentSlide={currentSlide}
+                  onSlideChange={setCurrentSlide}
+                  hasIntroduced={hasIntroduced}
+                  onIntroductionComplete={() => setHasIntroduced(true)}
+                />
+              </div>
+            )}
           </div>
-          
-          {!hasStarted && (
-            <StartButton onClick={() => setHasStarted(true)} />
-          )}
-          
-          <PitchDeck 
-            language={language} 
-            currentSlide={currentSlide}
-            onSlideChange={setCurrentSlide}
-          />
-          
-          {hasStarted && (
-            <ChatInterface 
-              language={language}
-              onSpeakingChange={setIsSpeaking}
-              currentSlide={currentSlide}
-              onSlideChange={setCurrentSlide}
-              hasIntroduced={hasIntroduced}
-              onIntroductionComplete={() => setHasIntroduced(true)}
-            />
-          )}
         </div>
       </div>
     </main>

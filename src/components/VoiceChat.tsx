@@ -49,9 +49,9 @@ function VoiceChatInner({
 
       const clmUrl = baseUrl ? `${baseUrl}/api/hume-clm?language=${language}` : undefined
 
-      console.log('[VoiceChat] Connecting with CLM URL:', clmUrl)
+      console.log('[VoiceChat] Connecting with CLM URL:', clmUrl, 'language:', language)
 
-      // Connect with auth token, config ID, and custom language model
+      // Connect with auth token, config ID, custom language model, and language settings
       await connect({
         auth: { type: 'accessToken', value: accessToken },
         configId: configId,
@@ -59,7 +59,11 @@ function VoiceChatInner({
           customLanguageModel: {
             url: clmUrl,
           }
-        })
+        }),
+        // Set session settings for language
+        sessionSettings: {
+          language: language === 'pt' ? 'pt' : 'en',
+        }
       })
       setIsStarted(true)
     } catch (error) {

@@ -32,8 +32,12 @@ export default function Home() {
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
           <div className="hidden lg:flex flex-1 pt-6">
-            {!hasStarted && (
+            {!hasStarted ? (
               <StartButton onClick={() => setHasStarted(true)} />
+            ) : (
+              <div className="z-[9999]">
+                <Avatar isSpeaking={isSpeaking} hasStarted={hasStarted} />
+              </div>
             )}
           </div>
           <Header />
@@ -41,10 +45,14 @@ export default function Home() {
             <LanguageSelector language={language} onLanguageChange={setLanguage} />
           </div>
         </div>
-        
+
         <div className="flex lg:hidden justify-center gap-2 -mt-5">
-          {!hasStarted && (
+          {!hasStarted ? (
             <StartButton onClick={() => setHasStarted(true)} />
+          ) : (
+            <div className="z-[9999]">
+              <Avatar isSpeaking={isSpeaking} hasStarted={hasStarted} />
+            </div>
           )}
           <LanguageSelector language={language} onLanguageChange={setLanguage} />
         </div>
@@ -54,11 +62,7 @@ export default function Home() {
         <div className="h-full max-w-screen-2xl mx-auto pb-4">
           <div className="flex flex-col lg:flex-row gap-4 h-full px-4 sm:px-6 lg:px-8">
             <div className="flex-1 relative min-h-0 pl-0">
-              <div className="fixed left-4 sm:left-6 lg:left-8 top-24 z-[9999]">
-                <Avatar isSpeaking={isSpeaking} hasStarted={hasStarted} />
-              </div>
-              
-              <PitchDeck 
+              <PitchDeck
                 language={language} 
                 currentSlide={currentSlide}
                 onSlideChange={setCurrentSlide}

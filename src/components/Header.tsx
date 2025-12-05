@@ -2,13 +2,14 @@ import Image from 'next/image'
 
 export default function Header() {
   return (
-    <header className="text-center flex-shrink-0">
+    <header className="flex-shrink-0">
       <Image 
         src="/NovoPresent.png" 
         alt="NoVo Present" 
         width={400} 
         height={80}
-        className="mx-auto"
+        className="mx-auto block"
+        style={{ display: 'block', margin: '0 auto' }}
         priority
       />
     </header>

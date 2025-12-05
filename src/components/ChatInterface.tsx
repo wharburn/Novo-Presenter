@@ -194,6 +194,7 @@ export default function ChatInterface({
           } else {
             // Presentation finished - show Q&A message
             console.log('Presentation complete - entering Q&A mode')
+            onSpeakingChange(false)  // Stop avatar animation
             setPresentationState('FINISHED')
             setCurrentNarration(qaEndMessage)
           }

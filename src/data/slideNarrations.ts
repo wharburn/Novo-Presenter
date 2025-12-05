@@ -211,100 +211,9 @@ First movers in contextual conversational AI for travel services.
 
 This is exactly when you want to be entering a market.`,
     },
-    // Slide 7: SEIS Bonus
+    // Slide 7: Investment Opportunity Summary (Financial Overview)
     {
       slide: 7,
-      title: "SEIS Bonus",
-      spokenText: `For UK investors, we have an exciting tax advantage to share.
-
-We will be applying for SEIS advanced assurance — that's the Seed Enterprise Investment Scheme.
-
-This allows any UK tax-paying investor to deduct 50 percent of the amount they invest from their next tax bill.
-
-So if you invest 10,000 pounds, you could reduce your tax bill by 5,000 pounds. It's a significant incentive that reduces your effective risk.
-
-This makes early-stage investment in NoVo particularly attractive for UK-based investors.`,
-      displayText: `**For UK Investors: SEIS Bonus**
-
-**What is SEIS?**
-Seed Enterprise Investment Scheme — a UK government program to encourage investment in early-stage companies.
-
-**The Benefit:**
-UK tax-paying investors can deduct 50% of their investment from their next tax bill.
-
-**Example:**
-• Invest £10,000
-• Reduce tax bill by £5,000
-• Effective risk significantly reduced
-
-**Our Status:**
-We will be applying for SEIS advanced assurance to qualify for this benefit.`,
-    },
-    // Slide 8: Roadmap
-    {
-      slide: 8,
-      title: "Roadmap",
-      spokenText: `Let me walk you through our development roadmap.
-
-Phase 1, months 1 to 3: We focus on research, architecture, user interface design, and hiring key team members.
-
-Phase 2, months 4 to 6: This is MVP development. We build payments, GPS integration, conduct initial testing, and start generating our first revenues.
-
-Phase 3, months 7 to 12: We raise 500,000 pounds, obtain our TfL license, launch the beta version, add security features, and begin marketing.
-
-Phase 4, months 12 to 24: We expand into Europe and focus on using the data collected from our user base to guide further application development.
-
-This phased approach lets us validate at each stage before scaling.`,
-      displayText: `**Roadmap**
-
-**Phase 1 (Months 1-3):**
-Research, architecture, User Interface design, hiring key team members.
-
-**Phase 2 (Months 4-6):**
-MVP development, payments integration, GPS, initial testing, first revenues.
-
-**Phase 3 (Months 7-12):**
-£500,000 raise, TfL license, beta version launch, security features, marketing.
-
-**Phase 4 (Months 12-24):**
-European expansion, focus on user data to guide application development.`,
-    },
-    // Slide 9: The Application and Next Steps
-    {
-      slide: 9,
-      title: "Next Steps",
-      spokenText: `So here's where we are and what we're looking for.
-
-We are seeking an initial investment of 65,000 pounds.
-
-These funds will go toward app development up to the MVP phase and building our driver network.
-
-Our goal is to have an MVP application that is used daily and integrated into an existing business — proving real-world value.
-
-The focus is on expanding the app's use beyond just car reservations into the full travel experience.
-
-This round prepares the company for the next fundraising round at a much higher valuation.`,
-      displayText: `**The Application and Next Steps**
-
-**Investment Ask:** £65,000
-
-**Use of Funds:**
-• App development through MVP phase
-• Building driver network
-• Initial operations
-
-**Immediate Goal:**
-MVP application used daily, integrated into existing business, generating real revenue.
-
-**Strategic Focus:**
-Expand beyond car reservations to full travel experience.
-
-**Outcome:**
-Prepare company for next fundraising round at higher valuation.`,
-    },
-    // Slide 10: Investment Opportunity Summary
-    {
-      slide: 10,
       title: "Investment Opportunity",
       spokenText: `Let me summarize why NoVo is such a compelling investment opportunity.
 
@@ -337,6 +246,97 @@ Emotional intelligence in a market where human connection matters most.
 
 **Investment Thesis:**
 Apply Palantir's winning AI interface formula to travel market = significant value capture opportunity.`,
+    },
+    // Slide 8: SEIS Bonus
+    {
+      slide: 8,
+      title: "SEIS Bonus",
+      spokenText: `For UK investors, we have an exciting tax advantage to share.
+
+We will be applying for SEIS advanced assurance — that's the Seed Enterprise Investment Scheme.
+
+This allows any UK tax-paying investor to deduct 50 percent of the amount they invest from their next tax bill.
+
+So if you invest 10,000 pounds, you could reduce your tax bill by 5,000 pounds. It's a significant incentive that reduces your effective risk.
+
+This makes early-stage investment in NoVo particularly attractive for UK-based investors.`,
+      displayText: `**For UK Investors: SEIS Bonus**
+
+**What is SEIS?**
+Seed Enterprise Investment Scheme — a UK government program to encourage investment in early-stage companies.
+
+**The Benefit:**
+UK tax-paying investors can deduct 50% of their investment from their next tax bill.
+
+**Example:**
+• Invest £10,000
+• Reduce tax bill by £5,000
+• Effective risk significantly reduced
+
+**Our Status:**
+We will be applying for SEIS advanced assurance to qualify for this benefit.`,
+    },
+    // Slide 9: Roadmap
+    {
+      slide: 9,
+      title: "Roadmap",
+      spokenText: `Let me walk you through our development roadmap.
+
+Phase 1, months 1 to 3: We focus on research, architecture, user interface design, and hiring key team members.
+
+Phase 2, months 4 to 6: This is MVP development. We build payments, GPS integration, conduct initial testing, and start generating our first revenues.
+
+Phase 3, months 7 to 12: We raise 500,000 pounds, obtain our TfL license, launch the beta version, add security features, and begin marketing.
+
+Phase 4, months 12 to 24: We expand into Europe and focus on using the data collected from our user base to guide further application development.
+
+This phased approach lets us validate at each stage before scaling.`,
+      displayText: `**Roadmap**
+
+**Phase 1 (Months 1-3):**
+Research, architecture, User Interface design, hiring key team members.
+
+**Phase 2 (Months 4-6):**
+MVP development, payments integration, GPS, initial testing, first revenues.
+
+**Phase 3 (Months 7-12):**
+£500,000 raise, TfL license, beta version launch, security features, marketing.
+
+**Phase 4 (Months 12-24):**
+European expansion, focus on user data to guide application development.`,
+    },
+    // Slide 10: The Application and Next Steps
+    {
+      slide: 10,
+      title: "Next Steps",
+      spokenText: `So here's where we are and what we're looking for.
+
+We are seeking an initial investment of 65,000 pounds.
+
+These funds will go toward app development up to the MVP phase and building our driver network.
+
+Our goal is to have an MVP application that is used daily and integrated into an existing business — proving real-world value.
+
+The focus is on expanding the app's use beyond just car reservations into the full travel experience.
+
+This round prepares the company for the next fundraising round at a much higher valuation.`,
+      displayText: `**The Application and Next Steps**
+
+**Investment Ask:** £65,000
+
+**Use of Funds:**
+• App development through MVP phase
+• Building driver network
+• Initial operations
+
+**Immediate Goal:**
+MVP application used daily, integrated into existing business, generating real revenue.
+
+**Strategic Focus:**
+Expand beyond car reservations to full travel experience.
+
+**Outcome:**
+Prepare company for next fundraising round at higher valuation.`,
     },
     // Slide 11: End/Thank You
     {

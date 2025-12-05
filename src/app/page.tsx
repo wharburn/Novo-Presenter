@@ -24,12 +24,12 @@ export default function Home() {
       
       <div className="flex-1 overflow-hidden pb-4">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-full">
-          <div className="flex gap-4 h-full relative">
-            {!hasStarted && (
-              <StartButton onClick={() => setHasStarted(true)} />
-            )}
-            
+          <div className="flex gap-4 h-full">
             <div className="flex-1 relative">
+              {!hasStarted && (
+                <StartButton onClick={() => setHasStarted(true)} />
+              )}
+              
               <div className="absolute left-4 sm:left-8 top-2 z-10">
                 <Avatar isSpeaking={isSpeaking} />
               </div>

@@ -25,6 +25,7 @@ export default function ChatInterface({
   onIntroductionComplete
 }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([])
+  const [currentNarration, setCurrentNarration] = useState('')
   const [input, setInput] = useState('')
   const [isRecording, setIsRecording] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -69,6 +70,7 @@ export default function ChatInterface({
       const data = await response.json()
       console.log('Received response for slide', slideNumber, ':', data)
       
+      setCurrentNarration(data.message)
       setMessages(prev => [...prev, { 
         role: 'assistant', 
         content: data.message 
@@ -132,6 +134,7 @@ export default function ChatInterface({
         ? "Hello! I'm NoVo, your AI presentation assistant. I'll be guiding you through the NoVo Travel Assistant pitch deck today. Feel free to ask questions at any time - I'll pause and answer before continuing with the presentation. Let's begin with our first slide!"
         : "Olá! Sou a NoVo, sua assistente de apresentação de IA. Vou guiá-lo através do pitch deck do NoVo Travel Assistant hoje. Sinta-se à vontade para fazer perguntas a qualquer momento - farei uma pausa e responderei antes de continuar com a apresentação. Vamos começar com nosso primeiro slide!"
       
+      setCurrentNarration(introduction)
       setMessages([{ role: 'assistant', content: introduction }])
       onIntroductionComplete()
       
@@ -292,58 +295,55 @@ export default function ChatInterface({
 
   return (
     <div className="h-full flex flex-col bg-white rounded-lg shadow-xl">
-      <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
-        {messages.length === 0 && (
+      <div className="flex-1 overflow-y-auto p-6">
+        {currentNarration ? (
+          <div className="bg-gray-50 p-4 rounded-lg shadow">
+            <p className="text-gray-800 text-base leading-relaxed whitespace-pre-line">
+              {currentNarration}
+            </p>
+          </div>
+        ) : (
           <p className="text-gray-400 text-center text-sm">
             {language === 'en' 
-              ? 'Ask me anything about NoVo Travel Assistant!' 
-              : 'Pergunte-me qualquer coisa sobre o NoVo Travel Assistant!'}
+              ? 'Click Start to begin the presentation' 
+              : 'Clique em Iniciar para começar a apresentação'}
           </p>
         )}
-        {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            className={`mb-3 p-3 rounded-lg text-sm ${
-              msg.role === 'user'
-                ? 'bg-[#5DADE2] text-white ml-auto max-w-[90%]'
-                : 'bg-white text-gray-800 mr-auto shadow'
-            }`}
-          >
-            {msg.content}
+        
+        {messages.filter(m => m.role === 'user').length > 0 && (
+          <div className="mt-4">
+            <p className="text-xs text-gray-500 mb-2 uppercase">Your Questions:</p>
+            {messages.filter(m => m.role === 'user').slice(-3).map((msg, idx) => (
+              <div
+                key={idx}
+                className="mb-2 p-2 rounded bg-[#5DADE2] text-white text-sm"
+              >
+                {msg.content}
+              </div>
+            ))}
           </div>
-        ))}
+        )}
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-4 border-t border-gray-200">
-        <div className="flex gap-2 mb-2">
+      <div className="p-4 border-t border-gray-200 bg-gray-50">
+        <div className="flex gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder={language === 'en' ? 'Type your question...' : 'Digite sua pergunta...'}
+            placeholder={language === 'en' ? 'Ask a question...' : 'Faça uma pergunta...'}
             className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5DADE2] text-sm"
             disabled={isProcessing}
           />
-          
-          <button
-            onClick={handleVoiceInput}
-            className={`px-3 py-2 rounded-lg transition-colors ${
-              isRecording 
-                ? 'bg-red-500 hover:bg-red-600 text-white' 
-                : 'bg-gray-500 hover:bg-gray-600 text-white'
-            }`}
-          >
-            🎤
-          </button>
           
           <button
             onClick={handleSendMessage}
             disabled={isProcessing || !input.trim()}
             className="px-4 py-2 bg-[#5DADE2] text-white rounded-lg hover:bg-[#4A9FD5] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
           >
-            {language === 'en' ? 'Send' : 'Enviar'}
+            {language === 'en' ? 'Ask' : 'Perguntar'}
           </button>
         </div>
       </div>

@@ -18,6 +18,7 @@ export default function Home() {
   const [skipToEnd, setSkipToEnd] = useState(false)
 
   const handleSkipToEnd = () => {
+    setIsSpeaking(false)  // Immediately silence avatar
     setHasStarted(true)
     setSkipToEnd(true)
   }

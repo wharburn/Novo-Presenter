@@ -51,6 +51,11 @@ function VoiceChatInner({
 
       console.log('[VoiceChat] Connecting with CLM URL:', clmUrl, 'language:', language)
 
+      // System prompt based on language
+      const systemPrompt = language === 'pt'
+        ? 'Você é NoVo, uma assistente de IA brasileira. SEMPRE responda em português brasileiro. Nunca responda em inglês. Você acabou de apresentar um pitch deck para investidores e agora está em uma sessão de perguntas e respostas.'
+        : 'You are NoVo, an AI assistant. You just finished presenting an investor pitch deck and are now in a Q&A session.'
+
       // Connect with auth token, config ID, custom language model, and language settings
       await connect({
         auth: { type: 'accessToken', value: accessToken },
@@ -60,9 +65,10 @@ function VoiceChatInner({
             url: clmUrl,
           }
         }),
-        // Set session settings for language
+        // Set session settings for language and system prompt
         sessionSettings: {
           language: language === 'pt' ? 'pt' : 'en',
+          systemPrompt: systemPrompt,
         }
       })
       setIsStarted(true)

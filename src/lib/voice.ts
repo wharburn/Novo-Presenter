@@ -5,7 +5,7 @@ export async function generateSpeech(text: string, language: string): Promise<st
       return ''
     }
 
-    const voiceId = process.env.ELEVENLABS_VOICE_ID || '21m00Tcm4TlvDq8ikWAM'
+    const voiceId = '21m00Tcm4TlvDq8ikWAM'
     
     console.log('Generating speech with ElevenLabs...')
     

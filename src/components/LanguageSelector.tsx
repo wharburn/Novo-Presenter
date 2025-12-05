@@ -5,10 +5,10 @@ interface LanguageSelectorProps {
 
 export default function LanguageSelector({ language, onLanguageChange }: LanguageSelectorProps) {
   return (
-    <div className="absolute top-4 right-4 flex gap-2 z-20">
+    <div className="flex gap-2">
       <button
         onClick={() => onLanguageChange('en')}
-        className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-sm sm:text-base ${
+        className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-sm sm:text-base w-24 ${
           language === 'en'
             ? 'bg-[#5DADE2] text-white'
             : 'bg-white text-gray-600 hover:bg-gray-100'
@@ -19,7 +19,7 @@ export default function LanguageSelector({ language, onLanguageChange }: Languag
       </button>
       <button
         onClick={() => onLanguageChange('pt')}
-        className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-sm sm:text-base ${
+        className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-sm sm:text-base w-24 ${
           language === 'pt'
             ? 'bg-[#5DADE2] text-white'
             : 'bg-white text-gray-600 hover:bg-gray-100'

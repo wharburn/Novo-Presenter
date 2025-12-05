@@ -6,6 +6,7 @@ import Avatar from '@/components/Avatar'
 import PitchDeck from '@/components/PitchDeck'
 import ChatInterface from '@/components/ChatInterface'
 import LanguageSelector from '@/components/LanguageSelector'
+import StartButton from '@/components/StartButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,6 +15,7 @@ export default function Home() {
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [hasIntroduced, setHasIntroduced] = useState(false)
+  const [hasStarted, setHasStarted] = useState(false)
 
   return (
     <main className="h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col overflow-hidden">
@@ -26,20 +28,26 @@ export default function Home() {
             <Avatar isSpeaking={isSpeaking} />
           </div>
           
+          {!hasStarted && (
+            <StartButton onClick={() => setHasStarted(true)} />
+          )}
+          
           <PitchDeck 
             language={language} 
             currentSlide={currentSlide}
             onSlideChange={setCurrentSlide}
           />
           
-          <ChatInterface 
-            language={language}
-            onSpeakingChange={setIsSpeaking}
-            currentSlide={currentSlide}
-            onSlideChange={setCurrentSlide}
-            hasIntroduced={hasIntroduced}
-            onIntroductionComplete={() => setHasIntroduced(true)}
-          />
+          {hasStarted && (
+            <ChatInterface 
+              language={language}
+              onSpeakingChange={setIsSpeaking}
+              currentSlide={currentSlide}
+              onSlideChange={setCurrentSlide}
+              hasIntroduced={hasIntroduced}
+              onIntroductionComplete={() => setHasIntroduced(true)}
+            />
+          )}
         </div>
       </div>
     </main>

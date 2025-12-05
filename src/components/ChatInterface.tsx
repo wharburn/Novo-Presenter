@@ -306,13 +306,24 @@ export default function ChatInterface({
   useEffect(() => {
     if (skipToEnd && presentationState !== 'FINISHED' && presentationState !== 'VOICE_QA') {
       console.log('Skipping to end of presentation...')
-      // Stop any playing audio
+
+      // Cancel any pending auto-advance
+      if (autoAdvanceTimerRef.current) {
+        clearTimeout(autoAdvanceTimerRef.current)
+        autoAdvanceTimerRef.current = null
+      }
+
+      // Stop any playing audio immediately
       if (audioRef.current) {
         audioRef.current.pause()
+        audioRef.current.currentTime = 0
         audioRef.current.src = ''
       }
+
+      // Silence the avatar
       onSpeakingChange(false)
       setIsProcessing(false)
+      setHighlightedSection(-1)
 
       // Set to last slide and finished state
       onSlideChange(11)

@@ -19,8 +19,13 @@ export default function Home() {
 
   return (
     <main className="h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col overflow-hidden">
-      <Header />
-      <LanguageSelector language={language} onLanguageChange={setLanguage} />
+      <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="flex-1"></div>
+        <Header />
+        <div className="flex-1 flex justify-end">
+          <LanguageSelector language={language} onLanguageChange={setLanguage} />
+        </div>
+      </div>
       
       <div className="flex-1 overflow-hidden pb-4">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-full">
@@ -41,18 +46,16 @@ export default function Home() {
               />
             </div>
             
-            {hasStarted && (
-              <div className="w-full lg:w-96 flex-shrink-0 h-64 lg:h-full">
-                <ChatInterface 
-                  language={language}
-                  onSpeakingChange={setIsSpeaking}
-                  currentSlide={currentSlide}
-                  onSlideChange={setCurrentSlide}
-                  hasIntroduced={hasIntroduced}
-                  onIntroductionComplete={() => setHasIntroduced(true)}
-                />
-              </div>
-            )}
+            <div className="w-full lg:w-96 flex-shrink-0 h-64 lg:h-full">
+              <ChatInterface 
+                language={language}
+                onSpeakingChange={setIsSpeaking}
+                currentSlide={currentSlide}
+                onSlideChange={setCurrentSlide}
+                hasIntroduced={hasIntroduced}
+                onIntroductionComplete={() => setHasIntroduced(true)}
+              />
+            </div>
           </div>
         </div>
       </div>

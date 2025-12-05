@@ -1,0 +1,65 @@
+# Render Blueprint for NoVo Presentation Chatbot
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: novo-presentation
+    runtime: node
+    region: oregon  # Choose: oregon, frankfurt, singapore, ohio
+    plan: starter   # starter plan for development, upgrade for production
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      # Node environment
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      
+      # Anthropic Claude API
+      - key: ANTHROPIC_API_KEY
+        sync: false  # Set manually in Render dashboard
+      
+      # Hume AI API
+      - key: HUME_API_KEY
+        sync: false
+      - key: HUME_SECRET_KEY
+        sync: false
+      - key: NEXT_PUBLIC_HUME_CONFIG_ID
+        sync: false
+      - key: HUME_VOICE_NAME
+        value: KORA
+      
+      # ElevenLabs API
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: ELEVENLABS_VOICE_ID
+        sync: false
+      
+      # Deepgram API
+      - key: DEEPGRAM_API_KEY
+        sync: false
+      
+      # Upstash Redis
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false
+      
+      # Upstash Vector
+      - key: UPSTASH_VECTOR_REST_URL
+        sync: false
+      - key: UPSTASH_VECTOR_REST_TOKEN
+        sync: false
+      
+      # TTS Provider (elevenlabs or hume)
+      - key: TTS_PROVIDER
+        value: elevenlabs
+      
+      # Application Settings
+      - key: DEFAULT_LANGUAGE
+        value: en
+      - key: SUPPORTED_LANGUAGES
+        value: en,pt
+

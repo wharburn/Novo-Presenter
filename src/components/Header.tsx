@@ -2,7 +2,7 @@ import Image from 'next/image'
 
 export default function Header() {
   return (
-    <header className="text-center flex-shrink-0 py-4">
+    <header className="text-center flex-shrink-0 py-2">
       <Image 
         src="/NovoPresent.png" 
         alt="NoVo Present" 

@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
-import { useWakeWord } from '@/hooks/useWakeWord'
+import { useState, useRef, useEffect } from 'react'
 import { slideNarrations } from '@/data/slideNarrations'
 
 interface Message {
@@ -9,7 +8,7 @@ interface Message {
   content: string
 }
 
-type PresentationState = 'IDLE' | 'PRESENTING' | 'LISTENING' | 'PROCESSING' | 'ANSWERING'
+type PresentationState = 'IDLE' | 'PRESENTING' | 'FINISHED' | 'PROCESSING'
 
 interface ChatInterfaceProps {
   language: 'en' | 'pt'
@@ -21,9 +20,9 @@ interface ChatInterfaceProps {
   hasStarted: boolean
 }
 
-export default function ChatInterface({ 
-  language, 
-  onSpeakingChange, 
+export default function ChatInterface({
+  language,
+  onSpeakingChange,
   currentSlide,
   onSlideChange,
   hasIntroduced,
@@ -31,12 +30,12 @@ export default function ChatInterface({
   hasStarted
 }: ChatInterfaceProps) {
   const welcomeText = language === 'en'
-    ? "Hello! I'm NoVo, the new personal assistant from Novocom Ai. Just press the start button when you are ready and we can begin to go through the presentation.\n\n\nIt should not take longer than 5 minutes. You also can stop me and ask any questions you have at any time and I will try my best to answer them for you.\n\n\nWhenever you are ready…."
-    : "Olá! Sou a NoVo, a nova assistente pessoal da Novocom Ai. Basta pressionar o botão iniciar quando estiver pronto e podemos começar a percorrer a apresentação.\n\n\nNão deve levar mais de 5 minutos. Você também pode me interromper e fazer qualquer pergunta que tiver a qualquer momento e farei o meu melhor para respondê-las.\n\n\nQuando estiver pronto…."
-  
+    ? "Hello! I'm NoVo, the new personal assistant from Novocom Ai. Just press the start button when you are ready and we can begin to go through the presentation.\n\n\nIt should not take longer than 5 minutes. At the end, you can ask me any questions you have and I will try my best to answer them for you.\n\n\nWhenever you are ready…."
+    : "Olá! Sou a NoVo, a nova assistente pessoal da Novocom Ai. Basta pressionar o botão iniciar quando estiver pronto e podemos começar a percorrer a apresentação.\n\n\nNão deve levar mais de 5 minutos. No final, você pode me fazer qualquer pergunta que tiver e farei o meu melhor para respondê-las.\n\n\nQuando estiver pronto…."
+
   const greetingText = language === 'en'
-    ? "Nice to meet you, I am Novo and I will be taking you through the presentation. You can stop and ask me any questions whenever you want just by saying my name.\n\n\nLets begin…"
-    : "Prazer em conhecê-lo, eu sou a Novo e vou levá-lo através da apresentação. Você pode parar e me fazer qualquer pergunta sempre que quiser apenas dizendo meu nome.\n\n\nVamos começar…"
+    ? "Nice to meet you, I am Novo and I will be taking you through the presentation. Feel free to ask me any questions at the end.\n\n\nLets begin…"
+    : "Prazer em conhecê-lo, eu sou a Novo e vou levá-lo através da apresentação. Sinta-se à vontade para me fazer perguntas no final.\n\n\nVamos começar…"
   
   const [messages, setMessages] = useState<Message[]>([])
   const [currentNarration, setCurrentNarration] = useState(welcomeText)
@@ -44,168 +43,16 @@ export default function ChatInterface({
   const [isProcessing, setIsProcessing] = useState(false)
   const [presentationState, setPresentationState] = useState<PresentationState>('IDLE')
   const [highlightedSection, setHighlightedSection] = useState<number>(-1)
-  const [totalSections, setTotalSections] = useState<number>(0)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const hasPlayedIntro = useRef(false)
   const hasPlayedGreeting = useRef(false)
   const autoAdvanceTimerRef = useRef<NodeJS.Timeout | null>(null)
-  const savedSlideRef = useRef<number>(0)
-  const startListeningRef = useRef<() => Promise<void>>(() => Promise.resolve())
 
-  // Wake word detection handlers
-  const handleWakeWordDetected = useCallback(() => {
-    console.log('Wake word "Novo" detected! Pausing presentation...')
-
-    // Save current position
-    savedSlideRef.current = currentSlide
-
-    // Pause any playing audio
-    if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current = null
-    }
-
-    // Clear auto-advance timer
-    if (autoAdvanceTimerRef.current) {
-      clearTimeout(autoAdvanceTimerRef.current)
-      autoAdvanceTimerRef.current = null
-    }
-
-    onSpeakingChange(false)
-    setPresentationState('LISTENING')
-
-    // Show listening indicator
-    setCurrentNarration(language === 'en'
-      ? '🎤 I\'m listening... ask your question.'
-      : '🎤 Estou ouvindo... faça sua pergunta.')
-  }, [currentSlide, language, onSpeakingChange])
-
-  const handleVoiceTranscript = useCallback((_transcript: string, _isFinal: boolean) => {
-    // Transcript is managed by the hook, we just need this callback
-  }, [])
-
-  const handleListeningComplete = useCallback(async (fullTranscript: string) => {
-    console.log('User finished speaking:', fullTranscript)
-
-    if (!fullTranscript.trim()) {
-      // No question detected, resume presentation
-      setPresentationState('PRESENTING')
-      presentNextSlide(savedSlideRef.current)
-      // Restart wake word detection using ref
-      startListeningRef.current().catch(err => console.error('Failed to restart wake word detection:', err))
-      return
-    }
-
-    setPresentationState('PROCESSING')
-    setCurrentNarration(language === 'en'
-      ? `Processing: "${fullTranscript}"...`
-      : `Processando: "${fullTranscript}"...`)
-
-    // Add user message
-    setMessages(prev => [...prev, { role: 'user', content: fullTranscript }])
-
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: fullTranscript,
-          language,
-          currentSlide: savedSlideRef.current,
-          isQuestion: true,
-        }),
-      })
-
-      const data = await response.json()
-
-      setPresentationState('ANSWERING')
-      setCurrentNarration(data.message)
-      setMessages(prev => [...prev, { role: 'assistant', content: data.message }])
-
-      if (data.audioUrl) {
-        onSpeakingChange(true)
-        const audio = new Audio(data.audioUrl)
-        audioRef.current = audio
-
-        audio.onended = () => {
-          onSpeakingChange(false)
-          audioRef.current = null
-
-          // Resume presentation from saved position
-          console.log('Answer complete, resuming from slide:', savedSlideRef.current)
-          setPresentationState('PRESENTING')
-
-          // Restart wake word detection using ref
-          console.log('[ChatInterface] Restarting wake word detection after answer...')
-          startListeningRef.current().catch(err => console.error('Failed to restart wake word detection:', err))
-
-          setTimeout(() => {
-            presentNextSlide(savedSlideRef.current)
-          }, 1000)
-        }
-
-        audio.onerror = () => {
-          onSpeakingChange(false)
-          audioRef.current = null
-          setPresentationState('PRESENTING')
-          // Restart wake word detection using ref
-          startListeningRef.current().catch(err => console.error('Failed to restart wake word detection:', err))
-        }
-
-        audio.play().catch(() => {
-          onSpeakingChange(false)
-          audioRef.current = null
-        })
-      } else {
-        // No audio, just resume after a delay
-        setTimeout(() => {
-          setPresentationState('PRESENTING')
-          // Restart wake word detection using ref
-          startListeningRef.current().catch(err => console.error('Failed to restart wake word detection:', err))
-          presentNextSlide(savedSlideRef.current)
-        }, 3000)
-      }
-    } catch (error) {
-      console.error('Error processing question:', error)
-      setCurrentNarration(language === 'en'
-        ? 'Sorry, I couldn\'t process that. Let me continue with the presentation.'
-        : 'Desculpe, não consegui processar. Deixe-me continuar com a apresentação.')
-
-      setTimeout(() => {
-        setPresentationState('PRESENTING')
-        // Restart wake word detection using ref
-        startListeningRef.current().catch(err => console.error('Failed to restart wake word detection:', err))
-        presentNextSlide(savedSlideRef.current)
-      }, 2000)
-    }
-  }, [language, onSpeakingChange])
-
-  // Initialize wake word detection
-  const {
-    isListening,
-    isAwake,
-    currentTranscript,
-    error: wakeWordError,
-    startListening,
-    stopListening,
-  } = useWakeWord({
-    wakeWord: 'novo',
-    onWakeWordDetected: handleWakeWordDetected,
-    onTranscript: handleVoiceTranscript,
-    onListeningComplete: handleListeningComplete,
-    silenceTimeout: 1500, // Wait 1.5s of silence before processing (faster response)
-  })
-
-  // Keep ref updated with latest startListening function
-  useEffect(() => {
-    startListeningRef.current = startListening
-  }, [startListening])
-
-  // Removed auto-scroll to bottom - keep text at top so headings are visible
-  // useEffect(() => {
-  //   messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  // }, [messages])
+  // Q&A end message
+  const qaEndMessage = language === 'en'
+    ? "That's the end of the presentation! Do you have any questions? Feel free to type them below and I'll do my best to answer."
+    : "Esse é o fim da apresentação! Você tem alguma pergunta? Sinta-se à vontade para digitá-las abaixo e farei o meu melhor para responder."
 
   const presentNextSlide = async (slideNumber: number) => {
     console.log('presentNextSlide called with:', slideNumber, 'isProcessing:', isProcessing)
@@ -248,7 +95,6 @@ export default function ChatInterface({
         (trimmed.length > 0 && !trimmed.match(/^\*\*/))  // Regular content
       )
     })
-    setTotalSections(sections.length)
     setHighlightedSection(0) // Start with first section
 
     setIsProcessing(true)
@@ -311,6 +157,11 @@ export default function ChatInterface({
               console.log('Auto-advancing to slide:', nextSlide)
               presentNextSlide(nextSlide)
             }, 200)
+          } else {
+            // Presentation finished - show Q&A message
+            console.log('Presentation complete - entering Q&A mode')
+            setPresentationState('FINISHED')
+            setCurrentNarration(qaEndMessage)
           }
         }
         audio.onerror = (e) => {
@@ -483,25 +334,7 @@ export default function ChatInterface({
     }
   }
 
-  // Start wake word listening when presentation starts
-  const hasStartedListeningRef = useRef(false)
-  useEffect(() => {
-    if (hasStarted && !hasStartedListeningRef.current) {
-      hasStartedListeningRef.current = true
-      console.log('[ChatInterface] Starting wake word detection...')
-      startListening().catch(err => {
-        console.error('Failed to start wake word detection:', err)
-        hasStartedListeningRef.current = false  // Allow retry on error
-      })
-    }
-  }, [hasStarted, startListening])
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      stopListening()
-    }
-  }, [stopListening])
 
   const formatTextWithBullets = (text: string, currentHighlight: number = -1) => {
     const lines = text.split('\n')
@@ -581,27 +414,17 @@ export default function ChatInterface({
           <h3 className="text-center text-lg font-semibold text-gray-800 flex-1">
             {language === 'en' ? 'Text Output' : 'Texto resumido'}
           </h3>
-          {/* Listening indicator */}
-          {isListening && (
-            <div className={`flex items-center gap-1 text-xs ${isAwake ? 'text-green-600' : 'text-gray-500'}`}>
-              <span className={`w-2 h-2 rounded-full ${isAwake ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></span>
-              {isAwake ? (language === 'en' ? 'Listening...' : 'Ouvindo...') : '🎤'}
+          {/* Presentation state indicator */}
+          {presentationState === 'FINISHED' && (
+            <div className="flex items-center gap-1 text-xs text-green-600">
+              <span className="w-2 h-2 rounded-full bg-green-500"></span>
+              {language === 'en' ? 'Q&A Mode' : 'Modo Q&A'}
             </div>
           )}
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 bg-white">
-        {/* Show current voice transcript when listening */}
-        {isAwake && currentTranscript && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-xs text-green-600 mb-1 font-semibold">
-              {language === 'en' ? 'You\'re saying:' : 'Você está dizendo:'}
-            </p>
-            <p className="text-sm text-green-800">{currentTranscript}</p>
-          </div>
-        )}
-
         {currentNarration ? (
         <div className="text-gray-800 text-base leading-relaxed whitespace-pre-line">
           {formatTextWithBullets(currentNarration, highlightedSection)}
@@ -633,24 +456,25 @@ export default function ChatInterface({
       </div>
 
       <div className="p-3 border-t border-gray-300 bg-white rounded-b-lg">
-        {wakeWordError && (
-          <p className="text-xs text-red-500 mb-2">⚠️ {wakeWordError}</p>
-        )}
         <div className="flex gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder={language === 'en' ? 'Type or say "Novo" to ask...' : 'Digite ou diga "Novo" para perguntar...'}
+            placeholder={
+              presentationState === 'FINISHED'
+                ? (language === 'en' ? 'Ask me any questions...' : 'Me faça qualquer pergunta...')
+                : (language === 'en' ? 'Questions will be answered at the end' : 'As perguntas serão respondidas no final')
+            }
             className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5DADE2] text-sm"
-            disabled={isProcessing}
+            disabled={isProcessing || presentationState === 'PRESENTING'}
           />
 
           <button
             type="button"
             onClick={handleSendMessage}
-            disabled={isProcessing || !input.trim()}
+            disabled={isProcessing || !input.trim() || presentationState === 'PRESENTING'}
             className="px-4 py-2 bg-[#5DADE2] text-white rounded-lg hover:bg-[#4A9FD5] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm whitespace-nowrap"
           >
             {language === 'en' ? 'Send' : 'Enviar'}

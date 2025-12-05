@@ -67,7 +67,7 @@ export default function PitchDeck({ language, currentSlide, onSlideChange }: Pit
           </button>
           
           <span className="text-gray-600 font-medium text-xs sm:text-base">
-            {currentSlide + 1} / {slides.length || 1}
+            {currentSlide === 0 ? '' : `${currentSlide} / ${slides.length - 1 || 1}`}
           </span>
           
           <button

@@ -49,6 +49,11 @@ html, body {
     top: 0;
     position: absolute;
   }
+  60% {
+    transform: scale(1);
+    top: 15px;
+    position: fixed;
+  }
   100% {
     transform: scale(1.25);
     top: 15px;
@@ -57,6 +62,6 @@ html, body {
 }
 
 .animate-avatar-rise {
-  animation: avatar-rise 1.5s ease-out forwards;
+  animation: avatar-rise 1.8s ease-out forwards;
   z-index: 100 !important;
 }

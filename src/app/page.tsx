@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
 import Avatar from '@/components/Avatar'
 import PitchDeck from '@/components/PitchDeck'
@@ -16,6 +16,18 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [hasIntroduced, setHasIntroduced] = useState(false)
   const [hasStarted, setHasStarted] = useState(false)
+  const [audioPrepared, setAudioPrepared] = useState(false)
+
+  useEffect(() => {
+    const handleMouseMove = () => {
+      if (!audioPrepared && !hasStarted) {
+        setAudioPrepared(true)
+      }
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [audioPrepared, hasStarted])
 
   return (
     <main className="h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col overflow-hidden">
@@ -45,7 +57,8 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row gap-4 h-full px-4 sm:px-6 lg:px-8">
             <div className="flex-1 relative min-h-0 pl-0">
               <div className="absolute left-0 top-0 z-10">
-                <Avatar isSpeaking={isSpeaking} />
+                <Avatar isSpeaking={isSpeaking} hasStarted={hasStarted} />
+              </div>
               </div>
               
               <PitchDeck 

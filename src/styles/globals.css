@@ -29,3 +29,31 @@ html, body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+@keyframes border-pulse {
+  0%, 100% {
+    border-width: 1px;
+  }
+  50% {
+    border-width: 6px;
+  }
+}
+
+.animate-border-pulse {
+  animation: border-pulse 2s ease-in-out infinite;
+}
+
+@keyframes avatar-rise {
+  from {
+    top: 0;
+    transform: scale(1);
+  }
+  to {
+    top: -24px;
+    transform: scale(1.15);
+  }
+}
+
+.animate-avatar-rise {
+  animation: avatar-rise 1s ease-out forwards;
+}

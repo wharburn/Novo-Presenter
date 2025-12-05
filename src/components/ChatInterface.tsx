@@ -296,37 +296,35 @@ export default function ChatInterface({
   const formatTextWithBullets = (text: string) => {
     const lines = text.split('\n')
     return lines.map((line, idx) => {
-      // Check if line has **text** pattern
-      const boldMatch = line.match(/\*\*([^*]+)\*\*/)
+      const trimmedLine = line.trim()
       
-      if (boldMatch) {
-        const boldText = boldMatch[1]
-        const afterBold = line.substring(line.indexOf('**') + boldText.length + 4).trim()
-        
-        // If there's text after the bold part, it's a bullet point
-        if (afterBold) {
-          return (
-            <div key={idx} className="flex items-start gap-2 my-1">
-              <span className="text-[#5DADE2] font-bold mt-1">•</span>
-              <span>{afterBold}</span>
-            </div>
-          )
-        } else {
-          // Just bold text, it's a heading
-          return (
-            <div key={idx} className="font-bold text-lg my-2">
-              {boldText}
-            </div>
-          )
-        }
+      if (!trimmedLine) return null
+      
+      // Check if line has **text**: pattern (bullet point with bold label)
+      const bulletMatch = trimmedLine.match(/^\*\*([^*]+)\*\*:\s*(.+)$/)
+      if (bulletMatch) {
+        const label = bulletMatch[1]
+        const content = bulletMatch[2]
+        return (
+          <div key={idx} className="flex items-start gap-2 my-1">
+            <span className="text-[#5DADE2] font-bold mt-1">•</span>
+            <span>{content}</span>
+          </div>
+        )
+      }
+      
+      // Check if line is just **text** (heading)
+      const headingMatch = trimmedLine.match(/^\*\*([^*]+)\*\*$/)
+      if (headingMatch) {
+        return (
+          <div key={idx} className="font-bold text-lg my-2">
+            {headingMatch[1]}
+          </div>
+        )
       }
       
       // Regular text
-      if (line.trim()) {
-        return <div key={idx} className="my-1">{line}</div>
-      }
-      
-      return null
+      return <div key={idx} className="my-1">{trimmedLine}</div>
     }).filter(Boolean)
   }
 

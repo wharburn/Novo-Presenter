@@ -22,6 +22,7 @@ interface ChatInterfaceProps {
   hasIntroduced: boolean
   onIntroductionComplete: () => void
   hasStarted: boolean
+  skipToEnd?: boolean
 }
 
 export default function ChatInterface({
@@ -31,7 +32,8 @@ export default function ChatInterface({
   onSlideChange,
   hasIntroduced,
   onIntroductionComplete,
-  hasStarted
+  hasStarted,
+  skipToEnd
 }: ChatInterfaceProps) {
   const welcomeText = language === 'en'
     ? "Hello! I'm NoVo, the new personal assistant from Novocom Ai. Just press the start button when you are ready and we can begin to go through the presentation.\n\n\nIt should not take longer than 5 minutes. At the end, we can have a conversation and I'll answer any questions you have.\n\n\nWhenever you are ready…."
@@ -298,6 +300,28 @@ export default function ChatInterface({
       }
     }
   }, [])
+
+  // Handle skip to end (long press on logo)
+  useEffect(() => {
+    if (skipToEnd && presentationState !== 'FINISHED' && presentationState !== 'VOICE_QA') {
+      console.log('Skipping to end of presentation...')
+      // Stop any playing audio
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current.src = ''
+      }
+      onSpeakingChange(false)
+      setIsProcessing(false)
+
+      // Set to last slide and finished state
+      onSlideChange(11)
+      setPresentationState('FINISHED')
+      const skipMessage = language === 'en'
+        ? "Presentation skipped. Ready for voice Q&A!"
+        : "Apresentação pulada. Pronto para perguntas por voz!"
+      setCurrentNarration(skipMessage)
+    }
+  }, [skipToEnd, presentationState, language, onSpeakingChange, onSlideChange])
 
   // Fetch Hume access token when presentation finishes
   useEffect(() => {

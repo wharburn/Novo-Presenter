@@ -42,12 +42,12 @@ function VoiceChatInner({
 
   const handleStart = async () => {
     try {
-      // Get the CLM endpoint URL for RAG-powered responses
-      const clmUrl = typeof window !== 'undefined'
-        ? `${window.location.origin}/api/hume-clm`
-        : process.env.NEXT_PUBLIC_SITE_URL
-          ? `${process.env.NEXT_PUBLIC_SITE_URL}/api/hume-clm`
-          : undefined
+      // Get the CLM endpoint URL for RAG-powered responses with language parameter
+      const baseUrl = typeof window !== 'undefined'
+        ? window.location.origin
+        : process.env.NEXT_PUBLIC_SITE_URL || ''
+
+      const clmUrl = baseUrl ? `${baseUrl}/api/hume-clm?language=${language}` : undefined
 
       console.log('[VoiceChat] Connecting with CLM URL:', clmUrl)
 

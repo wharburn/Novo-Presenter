@@ -57,26 +57,33 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const messages = body.messages || []
     const customSessionId = request.nextUrl.searchParams.get('custom_session_id')
-    
-    console.log('[Hume CLM] Received request, messages:', messages.length)
+    const language = request.nextUrl.searchParams.get('language') || 'en'
+
+    console.log('[Hume CLM] Received request, messages:', messages.length, 'language:', language)
 
     // Extract the latest user message
     const userMessages = messages.filter((m: any) => m.role === 'user')
     const latestUserMessage = userMessages[userMessages.length - 1]?.content || ''
-    
+
     // Get emotion context from Hume's analysis
     const emotionContext = extractEmotionContext(messages)
-    
+
     // Query RAG for relevant presentation context
-    const ragContext = await searchRAG(latestUserMessage, 'en')
+    const ragContext = await searchRAG(latestUserMessage, language as 'en' | 'pt')
     
     // Get time information
     const timeInfo = getTimeInfo()
     
     // Build system prompt with all context
+    const languageInstruction = language === 'pt'
+      ? 'IMPORTANT: You MUST respond in Portuguese (Brazilian Portuguese). All your responses should be in Portuguese.'
+      : 'Respond in English.'
+
     const systemPrompt = `You are NoVo, an emotionally intelligent AI assistant for NoVo Travel Assistant - an AI-powered travel companion startup.
 
 You have just finished presenting an investor pitch deck and are now in a Q&A session. Be warm, engaging, and helpful.
+
+${languageInstruction}
 
 ${timeInfo}
 
@@ -99,7 +106,8 @@ RESPONSE GUIDELINES:
 - Match the user's emotional tone - be empathetic if they seem concerned, enthusiastic if they're excited
 - For investment questions, be transparent and helpful
 - If asked about flights, news, or time-sensitive info, acknowledge you can provide real-time data
-- Always be professional but warm and approachable`
+- Always be professional but warm and approachable
+- ${language === 'pt' ? 'ALWAYS respond in Portuguese!' : 'Respond in English.'}`
 
     // Format messages for Claude
     const claudeMessages = messages

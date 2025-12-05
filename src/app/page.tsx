@@ -15,6 +15,12 @@ export default function Home() {
   const [hasIntroduced, setHasIntroduced] = useState(false)
   const [hasStarted, setHasStarted] = useState(false)
   const [audioPrepared, setAudioPrepared] = useState(false)
+  const [skipToEnd, setSkipToEnd] = useState(false)
+
+  const handleSkipToEnd = () => {
+    setHasStarted(true)
+    setSkipToEnd(true)
+  }
 
   useEffect(() => {
     const handleMouseMove = () => {
@@ -40,7 +46,7 @@ export default function Home() {
               </div>
             )}
           </div>
-          <Header />
+          <Header onSkipToEnd={handleSkipToEnd} />
           <div className="hidden lg:flex flex-1 justify-end pt-6">
             <LanguageSelector language={language} onLanguageChange={setLanguage} />
           </div>
@@ -70,7 +76,7 @@ export default function Home() {
             </div>
             
             <div className="w-full lg:w-96 flex-shrink-0 h-64 lg:h-full pr-0">
-              <ChatInterface 
+              <ChatInterface
                 language={language}
                 onSpeakingChange={setIsSpeaking}
                 currentSlide={currentSlide}
@@ -78,6 +84,7 @@ export default function Home() {
                 hasIntroduced={hasIntroduced}
                 onIntroductionComplete={() => setHasIntroduced(true)}
                 hasStarted={hasStarted}
+                skipToEnd={skipToEnd}
               />
             </div>
           </div>

@@ -1,7 +1,0 @@
-PLACEHOLDER: Add your static avatar image here (avatar.png)
-
-This file should be replaced with your actual avatar PNG image.
-For testing, you can use any PNG image of an avatar or character.
-
-Recommended size: 512x512px or larger
-Format: PNG with transparent background (preferred)

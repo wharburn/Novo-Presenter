@@ -38,9 +38,19 @@ export default function ChatInterface({
   }, [messages])
 
   const presentNextSlide = async (slideNumber: number) => {
-    if (slideNumber >= 11 || isProcessing) return
+    console.log('presentNextSlide called with:', slideNumber, 'isProcessing:', isProcessing)
+    if (slideNumber >= 11) {
+      console.log('Reached end of presentation')
+      return
+    }
+    
+    if (isProcessing) {
+      console.log('Already processing, skipping')
+      return
+    }
     
     setIsProcessing(true)
+    console.log('Starting to present slide:', slideNumber)
     
     try {
       const response = await fetch('/api/chat', {
@@ -54,15 +64,12 @@ export default function ChatInterface({
       })
 
       const data = await response.json()
+      console.log('Received response for slide', slideNumber, ':', data)
       
       setMessages(prev => [...prev, { 
         role: 'assistant', 
         content: data.message 
       }])
-
-      if (data.nextSlide !== undefined && data.nextSlide !== slideNumber) {
-        onSlideChange(data.nextSlide)
-      }
 
       if (data.audioUrl) {
         if (audioRef.current) {
@@ -70,11 +77,13 @@ export default function ChatInterface({
           audioRef.current = null
         }
         
+        console.log('Playing audio for slide:', slideNumber)
         onSpeakingChange(true)
         const audio = new Audio(data.audioUrl)
         audioRef.current = audio
         
         audio.onended = () => {
+          console.log('Audio ended for slide:', slideNumber)
           onSpeakingChange(false)
           audioRef.current = null
           
@@ -83,26 +92,32 @@ export default function ChatInterface({
           }
           
           const nextSlide = data.nextSlide !== undefined ? data.nextSlide : slideNumber + 1
+          console.log('Will advance to slide:', nextSlide, 'in 3 seconds')
           if (nextSlide < 11) {
             autoAdvanceTimerRef.current = setTimeout(() => {
-              onSlideChange(nextSlide)
+              console.log('Auto-advancing to slide:', nextSlide)
               presentNextSlide(nextSlide)
             }, 3000)
           }
         }
-        audio.onerror = () => {
+        audio.onerror = (e) => {
+          console.error('Audio error:', e)
           onSpeakingChange(false)
           audioRef.current = null
         }
-        audio.play().catch(() => {
+        audio.play().catch((err) => {
+          console.error('Audio play failed:', err)
           onSpeakingChange(false)
           audioRef.current = null
         })
+      } else {
+        console.log('No audio URL received for slide:', slideNumber)
       }
     } catch (error) {
       console.error('Error presenting slide:', error)
     } finally {
       setIsProcessing(false)
+      console.log('Finished processing slide:', slideNumber)
     }
   }
 
@@ -150,7 +165,7 @@ export default function ChatInterface({
                 clearTimeout(autoAdvanceTimerRef.current)
               }
               autoAdvanceTimerRef.current = setTimeout(() => {
-                onSlideChange(1)
+                console.log('Intro ended, advancing to slide 1')
                 presentNextSlide(1)
               }, 3000)
             }

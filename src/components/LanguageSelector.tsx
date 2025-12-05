@@ -8,10 +8,10 @@ export default function LanguageSelector({ language, onLanguageChange }: Languag
     <div className="flex gap-2">
       <button
         onClick={() => onLanguageChange('en')}
-        className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-sm sm:text-base w-24 ${
+        className={`py-2 rounded-lg font-medium transition-all text-sm sm:text-base w-24 border-2 ${
           language === 'en'
-            ? 'bg-[#5DADE2] text-white'
-            : 'bg-white text-gray-600 hover:bg-gray-100'
+            ? 'bg-[#5DADE2] text-white border-[#5DADE2]'
+            : 'bg-white text-gray-600 hover:bg-gray-100 border-gray-300'
         }`}
       >
         <span className="hidden sm:inline">English</span>
@@ -19,10 +19,10 @@ export default function LanguageSelector({ language, onLanguageChange }: Languag
       </button>
       <button
         onClick={() => onLanguageChange('pt')}
-        className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-sm sm:text-base w-24 ${
+        className={`py-2 rounded-lg font-medium transition-all text-sm sm:text-base w-24 border-2 ${
           language === 'pt'
-            ? 'bg-[#5DADE2] text-white'
-            : 'bg-white text-gray-600 hover:bg-gray-100'
+            ? 'bg-[#5DADE2] text-white border-[#5DADE2]'
+            : 'bg-white text-gray-600 hover:bg-gray-100 border-gray-300'
         }`}
       >
         <span className="hidden sm:inline">Português</span>

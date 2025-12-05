@@ -83,11 +83,11 @@ FLUXO DA APRESENTAÇÃO:
     { role: 'user', content: message },
   ]
 
-  console.log('Calling Anthropic API with model: claude-3-5-sonnet-latest')
+  console.log('Calling Anthropic API with model: claude-3-5-sonnet-20241022')
   
   try {
     const response = await getAnthropic().messages.create({
-      model: 'claude-3-5-sonnet-latest',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 1024,
       system: systemPrompt,
       messages: messages as any,

@@ -49,7 +49,7 @@ html, body {
     transform: scale(1);
   }
   to {
-    top: -24px;
+    top: 15px;
     transform: scale(1.15);
   }
 }

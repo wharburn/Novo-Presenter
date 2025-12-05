@@ -8,8 +8,8 @@ export default function Header() {
         alt="NoVo Present" 
         width={400} 
         height={80}
-        className="mx-auto block"
-        style={{ display: 'block', margin: '0 auto' }}
+        className="mx-auto"
+        style={{ width: '400px', height: 'auto' }}
         priority
       />
     </header>

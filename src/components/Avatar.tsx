@@ -6,7 +6,7 @@ interface AvatarProps {
 
 export default function Avatar({ isSpeaking }: AvatarProps) {
   return (
-    <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden shadow-xl border-4 border-white">
+    <div className="relative w-32 h-32 sm:w-36 sm:h-36 rounded-full overflow-hidden shadow-xl border-4 border-white">
       <Image
         src={isSpeaking ? '/avatar_speak.gif' : '/avatar_rest.gif'}
         alt="NoVo Avatar"

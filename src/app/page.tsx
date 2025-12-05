@@ -54,7 +54,7 @@ export default function Home() {
         <div className="h-full max-w-screen-2xl mx-auto pb-4">
           <div className="flex flex-col lg:flex-row gap-4 h-full px-4 sm:px-6 lg:px-8">
             <div className="flex-1 relative min-h-0 pl-0">
-              <div className="fixed left-4 sm:left-6 lg:left-8 top-auto bottom-auto z-[9999]" style={{ top: 'calc(50% - 64px)' }}>
+              <div className="fixed left-4 sm:left-6 lg:left-8 top-24 z-[9999]">
                 <Avatar isSpeaking={isSpeaking} hasStarted={hasStarted} />
               </div>
               

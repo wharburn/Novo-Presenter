@@ -49,6 +49,9 @@ export default function ChatInterface({
       return
     }
     
+    console.log('Changing slide display to:', slideNumber)
+    onSlideChange(slideNumber)
+    
     setIsProcessing(true)
     console.log('Starting to present slide:', slideNumber)
     

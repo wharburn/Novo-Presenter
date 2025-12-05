@@ -46,23 +46,55 @@ html, body {
 
 @keyframes avatar-rise {
   0% {
-    transform: scale(1);
     top: 0;
+    left: 0;
     position: absolute;
+    width: 8rem;
+    height: 8rem;
   }
-  80% {
-    transform: scale(1);
+  66.67% {
     top: 15px;
+    left: 0;
     position: fixed;
+    width: 8rem;
+    height: 8rem;
   }
   100% {
-    transform: scale(1.25);
     top: 15px;
+    left: 0;
     position: fixed;
+    width: 10rem;
+    height: 10rem;
+  }
+}
+
+@media (min-width: 640px) {
+  @keyframes avatar-rise {
+    0% {
+      top: 0;
+      left: 0;
+      position: absolute;
+      width: 9rem;
+      height: 9rem;
+    }
+    66.67% {
+      top: 15px;
+      left: 0;
+      position: fixed;
+      width: 9rem;
+      height: 9rem;
+    }
+    100% {
+      top: 15px;
+      left: 0;
+      position: fixed;
+      width: 11.25rem;
+      height: 11.25rem;
+    }
   }
 }
 
 .animate-avatar-rise {
-  animation: avatar-rise 2.5s ease-out forwards;
+  animation: avatar-rise 1.5s ease-out forwards;
   z-index: 100 !important;
 }

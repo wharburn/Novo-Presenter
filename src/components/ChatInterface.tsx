@@ -294,13 +294,17 @@ export default function ChatInterface({
   }
 
   return (
-    <div className="h-full flex flex-col bg-white rounded-lg shadow-xl">
-      <div className="flex-1 overflow-y-auto p-6">
+    <div className="h-full flex flex-col bg-gray-200 rounded-lg">
+      <div className="bg-gray-300 p-3 rounded-t-lg">
+        <h3 className="text-center text-lg font-semibold text-gray-800">
+          {language === 'en' ? 'Summarised text' : 'Texto resumido'}
+        </h3>
+      </div>
+      
+      <div className="flex-1 overflow-y-auto p-6 bg-white">
         {currentNarration ? (
-          <div className="bg-gray-50 p-4 rounded-lg shadow">
-            <p className="text-gray-800 text-base leading-relaxed whitespace-pre-line">
-              {currentNarration}
-            </p>
+          <div className="text-gray-800 text-base leading-relaxed whitespace-pre-line">
+            {currentNarration}
           </div>
         ) : (
           <p className="text-gray-400 text-center text-sm">
@@ -311,8 +315,8 @@ export default function ChatInterface({
         )}
         
         {messages.filter(m => m.role === 'user').length > 0 && (
-          <div className="mt-4">
-            <p className="text-xs text-gray-500 mb-2 uppercase">Your Questions:</p>
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-xs text-gray-500 mb-2 uppercase font-semibold">Your Questions:</p>
             {messages.filter(m => m.role === 'user').slice(-3).map((msg, idx) => (
               <div
                 key={idx}
@@ -326,14 +330,14 @@ export default function ChatInterface({
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-4 border-t border-gray-200 bg-gray-50">
+      <div className="p-3 border-t border-gray-300 bg-white rounded-b-lg">
         <div className="flex gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder={language === 'en' ? 'Ask a question...' : 'Faça uma pergunta...'}
+            placeholder={language === 'en' ? 'Type your question...' : 'Digite sua pergunta...'}
             className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5DADE2] text-sm"
             disabled={isProcessing}
           />
@@ -341,9 +345,9 @@ export default function ChatInterface({
           <button
             onClick={handleSendMessage}
             disabled={isProcessing || !input.trim()}
-            className="px-4 py-2 bg-[#5DADE2] text-white rounded-lg hover:bg-[#4A9FD5] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
+            className="px-4 py-2 bg-[#5DADE2] text-white rounded-lg hover:bg-[#4A9FD5] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm whitespace-nowrap"
           >
-            {language === 'en' ? 'Ask' : 'Perguntar'}
+            {language === 'en' ? 'Send' : 'Enviar'}
           </button>
         </div>
       </div>

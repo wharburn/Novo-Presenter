@@ -24,8 +24,8 @@ export default function Home() {
       
       <div className="flex-1 overflow-hidden pb-4">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-full">
-          <div className="flex gap-4 h-full">
-            <div className="flex-1 relative">
+          <div className="flex flex-col lg:flex-row gap-4 h-full">
+            <div className="flex-1 relative min-h-0">
               {!hasStarted && (
                 <StartButton onClick={() => setHasStarted(true)} />
               )}
@@ -42,7 +42,7 @@ export default function Home() {
             </div>
             
             {hasStarted && (
-              <div className="w-96 flex-shrink-0">
+              <div className="w-full lg:w-96 flex-shrink-0 h-64 lg:h-full">
                 <ChatInterface 
                   language={language}
                   onSpeakingChange={setIsSpeaking}

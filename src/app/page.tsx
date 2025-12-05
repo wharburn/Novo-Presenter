@@ -75,6 +75,7 @@ export default function Home() {
                 onSlideChange={setCurrentSlide}
                 hasIntroduced={hasIntroduced}
                 onIntroductionComplete={() => setHasIntroduced(true)}
+                hasStarted={hasStarted}
               />
             </div>
           </div>

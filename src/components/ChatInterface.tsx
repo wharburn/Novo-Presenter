@@ -14,6 +14,7 @@ interface ChatInterfaceProps {
   onSlideChange: (slide: number) => void
   hasIntroduced: boolean
   onIntroductionComplete: () => void
+  hasStarted: boolean
 }
 
 export default function ChatInterface({ 
@@ -22,11 +23,16 @@ export default function ChatInterface({
   currentSlide,
   onSlideChange,
   hasIntroduced,
-  onIntroductionComplete
+  onIntroductionComplete,
+  hasStarted
 }: ChatInterfaceProps) {
   const welcomeText = language === 'en'
     ? "Hello! I'm NoVo, the new personal assistant from Novocom Ai. Just press the start button when you are ready and we can begin to go through the presentation.\n\n\nIt should not take longer than 5 minutes. You also can stop me and ask any questions you have at any time and I will try my best to answer them for you.\n\n\nWhenever you are ready…."
     : "Olá! Sou a NoVo, a nova assistente pessoal da Novocom Ai. Basta pressionar o botão iniciar quando estiver pronto e podemos começar a percorrer a apresentação.\n\n\nNão deve levar mais de 5 minutos. Você também pode me interromper e fazer qualquer pergunta que tiver a qualquer momento e farei o meu melhor para respondê-las.\n\n\nQuando estiver pronto…."
+  
+  const greetingText = language === 'en'
+    ? "Nice to meet you, I am Novo and I will be taking you through the presentation. You can stop and ask me any questions whenever you want just by saying my name.\n\n\nLets begin…"
+    : "Prazer em conhecê-lo, eu sou a Novo e vou levá-lo através da apresentação. Você pode parar e me fazer qualquer pergunta sempre que quiser apenas dizendo meu nome.\n\n\nVamos começar…"
   
   const [messages, setMessages] = useState<Message[]>([])
   const [currentNarration, setCurrentNarration] = useState(welcomeText)
@@ -36,6 +42,7 @@ export default function ChatInterface({
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const hasPlayedIntro = useRef(false)
+  const hasPlayedGreeting = useRef(false)
   const autoAdvanceTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
@@ -139,6 +146,53 @@ export default function ChatInterface({
       // No need to play audio or change text
     }
   }, [hasIntroduced, onIntroductionComplete])
+
+  useEffect(() => {
+    if (hasStarted && !hasPlayedGreeting.current) {
+      hasPlayedGreeting.current = true
+      setCurrentNarration(greetingText)
+      
+      // Play greeting audio
+      fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: greetingText,
+          language,
+          currentSlide: 0,
+        }),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.audioUrl) {
+            onSpeakingChange(true)
+            const audio = new Audio(data.audioUrl)
+            audioRef.current = audio
+            
+            audio.onended = () => {
+              onSpeakingChange(false)
+              audioRef.current = null
+              
+              // Start presenting slide 1 after greeting
+              setTimeout(() => {
+                presentNextSlide(1)
+              }, 200)
+            }
+            
+            audio.onerror = () => {
+              onSpeakingChange(false)
+              audioRef.current = null
+            }
+            
+            audio.play().catch(() => {
+              onSpeakingChange(false)
+              audioRef.current = null
+            })
+          }
+        })
+        .catch(err => console.error('Greeting error:', err))
+    }
+  }, [hasStarted, greetingText, language, onSpeakingChange])
 
   useEffect(() => {
     return () => {
@@ -246,7 +300,10 @@ export default function ChatInterface({
     
     lines.forEach((line, idx) => {
       const trimmedLine = line.trim()
-      if (!trimmedLine) return
+      if (!trimmedLine) {
+        elements.push(<div key={idx} className="h-4"></div>)
+        return
+      }
       
       // Check if line is just **text** (main heading)
       const mainHeadingMatch = trimmedLine.match(/^\*\*([^*]+)\*\*$/)
@@ -296,15 +353,15 @@ export default function ChatInterface({
     <div className="h-full flex flex-col bg-gray-200 rounded-lg">
       <div className="bg-gray-300 p-3 rounded-t-lg">
         <h3 className="text-center text-lg font-semibold text-gray-800">
-          {language === 'en' ? 'Summarised text' : 'Texto resumido'}
+          {language === 'en' ? 'Text Output' : 'Texto resumido'}
         </h3>
       </div>
       
       <div className="flex-1 overflow-y-auto p-6 bg-white">
         {currentNarration ? (
-          <div className="text-gray-800 text-base leading-relaxed">
-            {formatTextWithBullets(currentNarration)}
-          </div>
+        <div className="text-gray-800 text-base leading-relaxed" style={{ whiteSpace: 'pre-line' }}>
+          {formatTextWithBullets(currentNarration)}
+        </div>
         ) : (
           <p className="text-gray-400 text-center text-sm">
             {language === 'en' 

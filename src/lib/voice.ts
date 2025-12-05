@@ -55,13 +55,17 @@ async function generateSpeechHume(text: string, description?: string): Promise<s
     return ''
   }
 
-  console.log('Generating speech with Hume AI Octave TTS')
+  // Support both voice ID (custom voices) and voice name (preset voices)
+  const voiceId = process.env.HUME_VOICE_ID
+  const voiceName = process.env.HUME_VOICE_NAME || 'KORA'
 
-  // Build the request body
+  console.log('Generating speech with Hume AI Octave TTS, voice:', voiceId || voiceName)
+
+  // Build the request body with proper typing for voice (id or name)
   const requestBody: {
     utterances: Array<{
       text: string
-      voice?: { name: string }
+      voice?: { id: string } | { name: string }
       description?: string
     }>
     format: { type: string }
@@ -70,8 +74,8 @@ async function generateSpeechHume(text: string, description?: string): Promise<s
     utterances: [
       {
         text,
-        // Use a predefined voice for instant mode (lower latency)
-        voice: { name: process.env.HUME_VOICE_NAME || 'KORA' },
+        // Use voice ID if provided (for custom voices like "Novo 3"), otherwise use name
+        voice: voiceId ? { id: voiceId } : { name: voiceName },
       }
     ],
     format: { type: 'mp3' },

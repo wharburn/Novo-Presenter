@@ -17,6 +17,7 @@ interface ChatParams {
   currentSlide: number
   ragContext: string
   conversationHistory: Array<{ role: string; content: string }>
+  isQuestion?: boolean
 }
 
 export async function chatWithClaude({
@@ -25,6 +26,7 @@ export async function chatWithClaude({
   currentSlide,
   ragContext,
   conversationHistory,
+  isQuestion = false,
 }: ChatParams) {
   console.log('chatWithClaude called with:', { message, language, currentSlide })
   console.log('API Key present:', !!process.env.ANTHROPIC_API_KEY)

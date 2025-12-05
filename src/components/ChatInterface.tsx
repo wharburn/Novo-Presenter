@@ -1,14 +1,18 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import dynamic from 'next/dynamic'
 import { slideNarrations } from '@/data/slideNarrations'
+
+// Dynamic import for VoiceChat to avoid SSR issues
+const VoiceChat = dynamic(() => import('./VoiceChat'), { ssr: false })
 
 interface Message {
   role: 'user' | 'assistant'
   content: string
 }
 
-type PresentationState = 'IDLE' | 'PRESENTING' | 'FINISHED' | 'PROCESSING'
+type PresentationState = 'IDLE' | 'PRESENTING' | 'FINISHED' | 'VOICE_QA'
 
 interface ChatInterfaceProps {
   language: 'en' | 'pt'
@@ -30,29 +34,32 @@ export default function ChatInterface({
   hasStarted
 }: ChatInterfaceProps) {
   const welcomeText = language === 'en'
-    ? "Hello! I'm NoVo, the new personal assistant from Novocom Ai. Just press the start button when you are ready and we can begin to go through the presentation.\n\n\nIt should not take longer than 5 minutes. At the end, you can ask me any questions you have and I will try my best to answer them for you.\n\n\nWhenever you are ready…."
-    : "Olá! Sou a NoVo, a nova assistente pessoal da Novocom Ai. Basta pressionar o botão iniciar quando estiver pronto e podemos começar a percorrer a apresentação.\n\n\nNão deve levar mais de 5 minutos. No final, você pode me fazer qualquer pergunta que tiver e farei o meu melhor para respondê-las.\n\n\nQuando estiver pronto…."
+    ? "Hello! I'm NoVo, the new personal assistant from Novocom Ai. Just press the start button when you are ready and we can begin to go through the presentation.\n\n\nIt should not take longer than 5 minutes. At the end, we can have a conversation and I'll answer any questions you have.\n\n\nWhenever you are ready…."
+    : "Olá! Sou a NoVo, a nova assistente pessoal da Novocom Ai. Basta pressionar o botão iniciar quando estiver pronto e podemos começar a percorrer a apresentação.\n\n\nNão deve levar mais de 5 minutos. No final, podemos conversar e responderei qualquer pergunta que você tiver.\n\n\nQuando estiver pronto…."
 
   const greetingText = language === 'en'
-    ? "Nice to meet you, I am Novo and I will be taking you through the presentation. Feel free to ask me any questions at the end.\n\n\nLets begin…"
-    : "Prazer em conhecê-lo, eu sou a Novo e vou levá-lo através da apresentação. Sinta-se à vontade para me fazer perguntas no final.\n\n\nVamos começar…"
-  
+    ? "Nice to meet you, I am Novo and I will be taking you through the presentation. At the end, we'll have a chance to chat.\n\n\nLets begin…"
+    : "Prazer em conhecê-lo, eu sou a Novo e vou levá-lo através da apresentação. No final, teremos a chance de conversar.\n\n\nVamos começar…"
+
   const [messages, setMessages] = useState<Message[]>([])
   const [currentNarration, setCurrentNarration] = useState(welcomeText)
-  const [input, setInput] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
   const [presentationState, setPresentationState] = useState<PresentationState>('IDLE')
   const [highlightedSection, setHighlightedSection] = useState<number>(-1)
+  const [humeAccessToken, setHumeAccessToken] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const hasPlayedIntro = useRef(false)
   const hasPlayedGreeting = useRef(false)
   const autoAdvanceTimerRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Q&A end message
+  // Hume EVI config ID from env
+  const humeConfigId = process.env.NEXT_PUBLIC_HUME_CONFIG_ID || ''
+
+  // Q&A end message - spoken by NoVo
   const qaEndMessage = language === 'en'
-    ? "That's the end of the presentation! Do you have any questions? Feel free to type them below and I'll do my best to answer."
-    : "Esse é o fim da apresentação! Você tem alguma pergunta? Sinta-se à vontade para digitá-las abaixo e farei o meu melhor para responder."
+    ? "That's the end of the presentation! Click the button below to start a voice conversation with me."
+    : "Esse é o fim da apresentação! Clique no botão abaixo para iniciar uma conversa por voz comigo."
 
   const presentNextSlide = async (slideNumber: number) => {
     console.log('presentNextSlide called with:', slideNumber, 'isProcessing:', isProcessing)
@@ -254,85 +261,36 @@ export default function ChatInterface({
     }
   }, [])
 
-  const handleSendMessage = async () => {
-    if (!input.trim() || isProcessing) return
-
-    if (autoAdvanceTimerRef.current) {
-      clearTimeout(autoAdvanceTimerRef.current)
-      autoAdvanceTimerRef.current = null
-    }
-
-    const userMessage = input.trim()
-    setInput('')
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }])
-    setIsProcessing(true)
-
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: userMessage,
-          language,
-          currentSlide,
-        }),
-      })
-
-      const data = await response.json()
-      
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: data.message 
-      }])
-
-      if (data.nextSlide !== undefined) {
-        onSlideChange(data.nextSlide)
-      }
-
-      if (data.audioUrl) {
-        if (audioRef.current) {
-          audioRef.current.pause()
-          audioRef.current = null
-        }
-        
-        onSpeakingChange(true)
-        const audio = new Audio(data.audioUrl)
-        audioRef.current = audio
-        
-        audio.onended = () => {
-          onSpeakingChange(false)
-          audioRef.current = null
-          
-          if (autoAdvanceTimerRef.current) {
-            clearTimeout(autoAdvanceTimerRef.current)
+  // Fetch Hume access token when presentation finishes
+  useEffect(() => {
+    if (presentationState === 'FINISHED' && !humeAccessToken) {
+      console.log('[HumeEVI] Fetching access token for voice Q&A...')
+      fetch('/api/hume-token')
+        .then(res => res.json())
+        .then(data => {
+          if (data.accessToken) {
+            setHumeAccessToken(data.accessToken)
+            console.log('[HumeEVI] Access token received')
           }
-          if (data.nextSlide !== undefined && data.nextSlide < 10) {
-            autoAdvanceTimerRef.current = setTimeout(() => {
-              onSlideChange(data.nextSlide + 1)
-            }, 3000)
-          }
-        }
-        audio.onerror = () => {
-          onSpeakingChange(false)
-          audioRef.current = null
-        }
-        audio.play().catch(() => {
-          onSpeakingChange(false)
-          audioRef.current = null
         })
-      }
-    } catch (error) {
-      console.error('Error sending message:', error)
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: language === 'en' 
-          ? 'Sorry, I encountered an error. Please try again.' 
-          : 'Desculpe, encontrei um erro. Por favor, tente novamente.'
-      }])
-    } finally {
-      setIsProcessing(false)
+        .catch(err => console.error('[HumeEVI] Token error:', err))
     }
-  }
+  }, [presentationState, humeAccessToken])
+
+  // Handle messages from Hume EVI
+  const handleVoiceMessage = useCallback((text: string, role: 'user' | 'assistant') => {
+    setMessages(prev => [...prev, { role, content: text }])
+    if (role === 'assistant') {
+      setCurrentNarration(text)
+    }
+  }, [])
+
+  // Handle voice chat state changes
+  const handleVoiceStateChange = useCallback((isActive: boolean) => {
+    if (isActive) {
+      setPresentationState('VOICE_QA')
+    }
+  }, [])
 
 
 
@@ -455,32 +413,39 @@ export default function ChatInterface({
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-3 border-t border-gray-300 bg-white rounded-b-lg">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder={
-              presentationState === 'FINISHED'
-                ? (language === 'en' ? 'Ask me any questions...' : 'Me faça qualquer pergunta...')
-                : (language === 'en' ? 'Questions will be answered at the end' : 'As perguntas serão respondidas no final')
-            }
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5DADE2] text-sm"
-            disabled={isProcessing || presentationState === 'PRESENTING'}
+      {/* Voice Chat Section - shows after presentation ends */}
+      {(presentationState === 'FINISHED' || presentationState === 'VOICE_QA') && humeAccessToken && humeConfigId && (
+        <div className="border-t border-gray-300 bg-gradient-to-b from-gray-50 to-white rounded-b-lg">
+          <VoiceChat
+            accessToken={humeAccessToken}
+            configId={humeConfigId}
+            language={language}
+            onMessage={handleVoiceMessage}
+            onStateChange={handleVoiceStateChange}
           />
-
-          <button
-            type="button"
-            onClick={handleSendMessage}
-            disabled={isProcessing || !input.trim() || presentationState === 'PRESENTING'}
-            className="px-4 py-2 bg-[#5DADE2] text-white rounded-lg hover:bg-[#4A9FD5] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm whitespace-nowrap"
-          >
-            {language === 'en' ? 'Send' : 'Enviar'}
-          </button>
         </div>
-      </div>
+      )}
+
+      {/* Loading indicator for voice chat */}
+      {presentationState === 'FINISHED' && !humeAccessToken && (
+        <div className="p-4 border-t border-gray-300 bg-white rounded-b-lg text-center text-gray-500">
+          <div className="flex items-center justify-center gap-2">
+            <div className="animate-spin h-4 w-4 border-2 border-[#5DADE2] border-t-transparent rounded-full"></div>
+            {language === 'en' ? 'Preparing voice chat...' : 'Preparando chat de voz...'}
+          </div>
+        </div>
+      )}
+
+      {/* Placeholder during presentation */}
+      {presentationState !== 'FINISHED' && presentationState !== 'VOICE_QA' && (
+        <div className="p-3 border-t border-gray-300 bg-white rounded-b-lg">
+          <div className="text-center text-gray-400 text-sm py-2">
+            {language === 'en'
+              ? 'Voice Q&A will be available at the end of the presentation'
+              : 'Perguntas por voz estarão disponíveis no final da apresentação'}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
